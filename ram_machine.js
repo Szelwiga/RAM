@@ -2,7 +2,19 @@ const RAM_DEFAULT_CACHE_SIZE = 10;
 const RAM_DEFAULT_EVENTS_TIMES = {
 	"runtime_error": 10,
 	"get_value": 1,
-	"move_cache": 10
+	"move_cache": 5,
+	"read": 10,
+	"write": 10,
+	"store": 1,
+	"load": 1,
+	"add": 1,
+	"sub": 1,
+	"mult": 3,
+	"div": 5,
+	"jump": 2,
+	"checkgtz": 1,
+	"checkzero": 1,
+	"halt": 1,
 };
 class ram_machine {
 	/*
@@ -16,13 +28,12 @@ class ram_machine {
 			memory     -- memory state
 			ip         -- instruction_pointer
 			cache_p    -- current cache pointer
-			state      -- running | ended
 
 			input      -- input for program
 			input_p    -- input pointer
 			output     -- produced output
 
-			instruction_times  -- time it takes for each operation to complete
+			event_times  -- time it takes for each operation to complete
 			cache_size         -- cache size
 			
 		# constants and settings #
@@ -66,7 +77,7 @@ class ram_machine {
 
 		# run_one_step #
 
-			{status: "ok/re/next", events: [...]}
+			{status: "ok/re/done", events: [...]}
 	*/
 
 	constructor(){
@@ -75,7 +86,7 @@ class ram_machine {
 		this.time_limit        = Infinity;
 
 		this.variable_type = "BigInt";
-		this.zero_fill     = true;
+		this.zero_fill     = false;
 
 		this.instruction_counter = 0;
 		this.time_counter        = 0;
@@ -85,7 +96,7 @@ class ram_machine {
 		this.output = [];
 
 		this.cache_size = RAM_DEFAULT_CACHE_SIZE;
-		this.events_times = RAM_DEFAULT_EVENTS_TIMES;
+		this.event_times = RAM_DEFAULT_EVENTS_TIMES;
 	}
 
 	clear_state(){
@@ -93,10 +104,18 @@ class ram_machine {
 		this.memory   = [];
 		this.input_p  = 0;
 		this.output   = [];
-		this.state    = "running";
 		this.cache_p  = 1;
 	}
 	
+	int64orBigInt(x){
+		/* TODO int64_t */
+		/* emulation of 64 bit variables with sign */
+		if (this.variable_type == "BigInt")
+			return x;
+		else
+			return x%(1n<<63n);
+	}
+
 	get_value(x){
 		/* returns content of given cell */
 		return this.memory[x] == undefined ? (this.zero_fill ? 0 : undefined) : this.memory[x];
@@ -106,7 +125,7 @@ class ram_machine {
 		/* returns current cache state */
 		var res = [];
 		for (var i=this.cache_p; i<this.cache_p + this.cache_size; i++){
-			res.push([i, get_value(i)]);
+			res.push([i, this.get_value(i)]);
 		}
 	}
 	
@@ -128,13 +147,16 @@ class ram_machine {
 		} else if (x[0] == '^'){
 			/* ^xxx adjust cache and read the content of memory */
 			var cell = BigInt(x.substr(1, x.length-1));
-			var events = adjust_cache(cell);
+			var events = this.adjust_cache(cell);
+
+			this.memory_counter = this.memory_counter > cell ? this.memory_counter : cell;
+
 			events.push({event: "get_value", from: cell});
-			if (get_value(cell) == undefined){
+			if (this.get_value(cell) == undefined){
 				events.push({event: "runtime_error", details: "read from undefined cell"})
 				return {result: undefined, events: events};
 			} else {
-				return {result: get_value(cell), events: events};
+				return {result: this.get_value(cell), events: events};
 			}
 		} else {
 			/* there is no need to resolve address */
@@ -146,56 +168,163 @@ class ram_machine {
 		/* resolves value from instruction argument */
 		if (x[0] == '='){
 			/* the value is hidden in the instruction */
-			return {result: BigInt(x.substr(1, x.length-1)), []};
+			return {result: BigInt(x.substr(1, x.length-1)), events: []};
 		}
 		
 		/* resolve the address at first */
-		var addr = resolve_addr(x);
+		var addr = this.resolve_addr(x);
 		if (addr.result == undefined)
 			return addr;
 		var events = addr.events;
 		var cell   = addr.result;
 
+		this.memory_counter = this.memory_counter > cell ? this.memory_counter : cell;
+
 		/* adjust cache and read memory content */
-		for (var e of adjust_cache(cell))	events.push_back(e);
+		for (var e of this.adjust_cache(cell))	events.push_back(e);
 		events.push({event: "get_value", from: cell});
-		var value = get_value(cell);
+		var value = this.get_value(cell);
 		if (value == undefined) {
 			events.push({event: "runtime_error", details: "read undefined value"})
 			return {result: undefined, events: events};
 		} else {
-			return {result: get_value(cell, events: events)};
+			return {result: value, events: events};
 		}
 	}
-	
+
+	update_time_counter(events){
+		/* update global counter */
+		for (var event of events)
+			this.time_counter += this.event_times[event.event];
+	}
+
 	run_one_step(){
 		/* runs one step of simulation and returns what happend */
+		if (this.code[this.ip] == undefined || this.code[this.ip][0] == undefined){
+			var events = [{event: "halt"}];
+			return {status: "done", events: events};
+		}
+
 		var events      = [];
-		var instruction = this.code[ip][0];
-		var argument    = this.code[ip][1];
-		
+		var instruction = this.code[this.ip][0];
+		var argument    = this.code[this.ip][1];
+
+		this.instruction_counter++;
 		if (instruction == "read") {
+			/* the read instruction */
+			var res = this.resolve_addr(argument);
+			if (res.result == undefined){
+				return {status: "re", events: res.events};
+			}
+			if (this.input_p == this.input.length){
+				res.events.push({event: "runtime_error", details: "attempting to read with empty input"})
+				return {status: "re", events: res.events};
+			}
+
+			this.memory[res.result] = this.int64orBigInt(this.input[this.input_p++]);
+			res.events.push({event: "read", to: res.result, value: this.memory[res.result]});
+
+			this.ip = this.next_line[this.ip];
+			this.update_time_counter(res.events);
+			return {status: "ok", events: res.events};
 			
 		} else if (instruction == "write"){
+			/* the write instruction */
+			var res = this.resolve_value(argument);
+			if (res.result == undefined){
+				return {status: "re", events: res.events};
+			}
+
+			this.output.push(res.result);
+			res.events.push({event: "write", value: res.result});
+
+			this.ip = this.next_line[this.ip];
+			this.update_time_counter(res.events);
+			return {status: "ok", events: res.events};
 			
 		} else if (instruction == "load"){
+			/* the load instruction */
+			var res = this.resolve_value(argument);
+			if (res.result == undefined){
+				return {status: "re", events: res.events};
+			}
+
+			this.memory[0] = this.int64orBigInt(res.result);
+			res.events.push({event: "load", value: res.result});
+
+			this.ip = this.next_line[this.ip];
+			this.update_time_counter(res.events);
+			return {status: "ok", events: res.events};
 			
 		} else if (instruction == "store"){
+			/* the store instruction */
+			var res = this.resolve_addr(argument);
+			if (res.result == undefined){
+				return {status: "re", events: res.events};
+			}
+
+			this.memory[res.result] = this.memory[0];
+			res.events.push({event: "store", value: this.memory[0], to: res.result});
+
+			this.ip = this.next_line[this.ip];
+			this.update_time_counter(res.events);
+			return {status: "ok", events: res.events};
+						
+		} else if (instruction == "add"  || instruction == "sub" || 
+		           instruction == "mult" || instruction == "div"){
+			/* the alu instructions */
+			var res = this.resolve_value(argument);
+			if (res.result == undefined){
+				return {status: "re", events: res.events};
+			}
+			if (instruction == "add"){
+				this.memory[0] = this.int64orBigInt(this.memory[0] + res.result);
+				res.events.push({event: "add",  value: res.result, new_value: this.memory[0]});
+
+			} else if (instruction == "sub"){
+				this.memory[0] = this.int64orBigInt(this.memory[0] - res.result);
+				res.events.push({event: "sub",  value: res.result, new_value: this.memory[0]});
+
+			} else if (instruction == "mult"){
+				this.memory[0] = this.int64orBigInt(this.memory[0] * res.result);
+				res.events.push({event: "mult", value: res.result, new_value: this.memory[0]});
+
+			} else if (instruction == "div"){
+				this.memory[0] = this.int64orBigInt(this.memory[0] / res.result);
+				res.events.push({event: "div",  value: res.result, new_value: this.memory[0]});
+			}
 			
-		} else if (instruction == "add"){
+			this.ip = this.next_line[this.ip];
+			this.update_time_counter(res.events);
+			return {status: "ok", events: res.events};
 			
-		} else if (instruction == "sub"){
-			
-		} else if (instruction == "div"){
-			
-		} else if (instruction == "jump"){
-			
-		} else if (instruction == "jgtz"){
-			
-		} else if (instruction == "jzero"){
+		} else if (instruction == "jump" || instruction == "jzero" || instruction == "jgtz"){
+			/* the jumps instructions */
+			var jump = 0;
+			var events = [];
+			if (instruction == "jump"){
+				jump = 1;
+				
+			} else if (instruction == "jgtz") {
+				jump = this.memory[0] > 0;
+				events.push({event: "checkgtz", result: jump});
+				
+			} else if (instruction == "jzero") {
+				jump = this.memory[0] == 0;
+				events.push({event: "checkzero", result: jump});
+			}
+			if (jump) {
+				this.ip = this.jumps[argument];
+				events.push({event: "jump", label: argument});
+			} else {
+				this.ip = this.next_line[this.ip];
+			}
+			this.update_time_counter(events);
+			return {status: "ok", events: events};
 			
 		} else if (instruction == "halt"){
-			
+			var events = [{event: "halt"}];
+			return {status: "done", events: events};
 		}
 		
 	}
@@ -351,7 +480,8 @@ class ram_machine {
 		var next = lines.length;
 		for (var i=lines.length-1; i>=0; i--){
 			this.next_line[i] = next;
-			if (lines.length != 0)	next = i;
+			if (lines[i].length != 0)
+				next = i;
 		}
 
 
@@ -494,8 +624,17 @@ var code1 = `
 
 console.log("Test 1");
 console.log(RAM.parse_code(code1));
-console.log("")
+RAM.clear_state();
+RAM.set_input("3 2 1")
+console.log(RAM.code)
+console.log(RAM.next_line)
+do {
+	var status = RAM.run_one_step();
+	console.log("status: ", status);
+} while (status.status == "ok");
 
+console.log(RAM.get_output())
+console.log("")
 
 var code2 = `
 		load =0
@@ -507,10 +646,26 @@ loop:
 		add =1
 		store 1
 		jump loop
-end:	write 2
+end:	write 1
 		halt
 `;
 
 console.log("Test 2");
 console.log(RAM.parse_code(code2));
 console.log("")
+
+RAM.clear_state();
+RAM.set_input("3 2 1 0")
+console.log(RAM.code)
+console.log(RAM.next_line)
+do {
+	var status = RAM.run_one_step();
+	console.log("status: ", status);
+} while (status.status == "ok");
+
+console.log(RAM.get_output())
+console.log("")
+
+console.log("instructions: ", RAM.instruction_counter);
+console.log("max memory:   ", RAM.memory_counter);
+console.log("time counter: ", RAM.time_counter);
