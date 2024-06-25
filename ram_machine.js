@@ -1,3 +1,9 @@
+const RAM_DEFAULT_CACHE_SIZE = 10;
+const RAM_DEFAULT_EVENTS_TIMES = {
+	"runtime_error": 10,
+	"get_value": 1,
+	"move_cache": 10
+};
 class ram_machine {
 	/*
 		# variables #
@@ -5,13 +11,19 @@ class ram_machine {
 			code       -- instructions array
 			next_line  -- next non-empty line number array
 			jumps      -- label to line number map
+			entry      -- line number with first valid instruction
+
 			memory     -- memory state
 			ip         -- instruction_pointer
+			cache_p    -- current cache pointer
+			state      -- running | ended
+
 			input      -- input for program
 			input_p    -- input pointer
 			output     -- produced output
-			entry      -- line number with first valid instruction
-			state      -- running | ended
+
+			instruction_times  -- time it takes for each operation to complete
+			cache_size         -- cache size
 			
 		# constants and settings #
 		
@@ -19,7 +31,7 @@ class ram_machine {
 			instruction_limit    -- intruction count limit
 			time_limit           -- instruction by time limit 
 
-			variable_type   -- either BigInt or uint64_t
+			variable_type   -- either BigInt or 64bit
 			zero_fill       -- should fill empty cells with zeros?
 
 			instruction_times -- times it takes for each instruction to execute
@@ -30,7 +42,7 @@ class ram_machine {
 			time_counter         -- time counsed during execution
 			memory_counter       -- max cell number used during exection
 
-		# functions #
+		# outside functions #
 
 			parse_code   -- parses code
 			clear_state  -- clears memory and resets counters
@@ -39,13 +51,23 @@ class ram_machine {
 			run_one_step -- runs one step and returns what happend
 			checks_limit -- checks if code will end in specified amount of instructions
 			run_full     -- runs code and produces output
-			
-		# parsing errors #
+
+		# inside functions #
+
+			get_value       -- returns the value from cell
+			adjust_cache    -- resolves_addr
+			get_page_state  -- returns cache state
+			resolve_addr    -- resolves addres (for store and read)
+			resolve_value   -- resolves values for other instructions
+					
+		# parse_code output #
 
 			{status: "ok"/"pe", line_number: xxx, description: sss}
 
-	*/
+		# run_one_step #
 
+			{status: "ok/re/next", events: [...]}
+	*/
 
 	constructor(){
 		this.memory_limit      = Infinity;
@@ -61,7 +83,9 @@ class ram_machine {
 
 		this.input  = [];
 		this.output = [];
-		// this.instruction_times TODO
+
+		this.cache_size = RAM_DEFAULT_CACHE_SIZE;
+		this.events_times = RAM_DEFAULT_EVENTS_TIMES;
 	}
 
 	clear_state(){
@@ -70,13 +94,142 @@ class ram_machine {
 		this.input_p  = 0;
 		this.output   = [];
 		this.state    = "running";
+		this.cache_p  = 1;
+	}
+	
+	get_value(x){
+		/* returns content of given cell */
+		return this.memory[x] == undefined ? (this.zero_fill ? 0 : undefined) : this.memory[x];
+	}
+
+	get_page_state(){
+		/* returns current cache state */
+		var res = [];
+		for (var i=this.cache_p; i<this.cache_p + this.cache_size; i++){
+			res.push([i, get_value(i)]);
+		}
+	}
+	
+	adjust_cache(x){
+		/* adjust the cache and returns it's new state in case of change */
+		if (x == 0 || (this.cache_p <= x && x < this.cache_p + this.cache_size)){
+			return [];
+		} else {
+			this.cache_p = (x - (x-1)%this.cache_size);
+			return [{event: "move_cache", page_state: get_page_state()}];
+		}
+	}
+
+	resolve_addr(x){
+		/* resolves address */
+		if (x[0] == '='){
+			/* =xxx is not a valid address */
+			return {result: undefined, events: [{event: "runtime_error", details: "this should not happend please report bug"}]};
+		} else if (x[0] == '^'){
+			/* ^xxx adjust cache and read the content of memory */
+			var cell = BigInt(x.substr(1, x.length-1));
+			var events = adjust_cache(cell);
+			events.push({event: "get_value", from: cell});
+			if (get_value(cell) == undefined){
+				events.push({event: "runtime_error", details: "read from undefined cell"})
+				return {result: undefined, events: events};
+			} else {
+				return {result: get_value(cell), events: events};
+			}
+		} else {
+			/* there is no need to resolve address */
+			return {result: BigInt(x), events: []};
+		}
+	}
+	
+	resolve_value(x){
+		/* resolves value from instruction argument */
+		if (x[0] == '='){
+			/* the value is hidden in the instruction */
+			return {result: BigInt(x.substr(1, x.length-1)), []};
+		}
+		
+		/* resolve the address at first */
+		var addr = resolve_addr(x);
+		if (addr.result == undefined)
+			return addr;
+		var events = addr.events;
+		var cell   = addr.result;
+
+		/* adjust cache and read memory content */
+		for (var e of adjust_cache(cell))	events.push_back(e);
+		events.push({event: "get_value", from: cell});
+		var value = get_value(cell);
+		if (value == undefined) {
+			events.push({event: "runtime_error", details: "read undefined value"})
+			return {result: undefined, events: events};
+		} else {
+			return {result: get_value(cell, events: events)};
+		}
+	}
+	
+	run_one_step(){
+		/* runs one step of simulation and returns what happend */
+		var events      = [];
+		var instruction = this.code[ip][0];
+		var argument    = this.code[ip][1];
+		
+		if (instruction == "read") {
+			
+		} else if (instruction == "write"){
+			
+		} else if (instruction == "load"){
+			
+		} else if (instruction == "store"){
+			
+		} else if (instruction == "add"){
+			
+		} else if (instruction == "sub"){
+			
+		} else if (instruction == "div"){
+			
+		} else if (instruction == "jump"){
+			
+		} else if (instruction == "jgtz"){
+			
+		} else if (instruction == "jzero"){
+			
+		} else if (instruction == "halt"){
+			
+		}
+		
 	}
 	
 	set_input(s){
+		/* parses the input to BigInts */
 		var separators = {' ': 1, '\t': 1, '\r': 1, '\n': 1};
-		var preffix
-		for (var i )
+		var current = "";
+		s += ' ';
+		this.input = [];
+		for (var c of s){
+			if (separators[c] == 1){
+				var x, fail = 0;
+				try {
+					x = BigInt(current);
+				} catch(e) {
+					for (var cc of current)
+						this.input.push(BigInt(cc.charCodeAt(0)));
+					this.input.push(BigInt(0));
+					fail = 1;
+				}
+				if (!fail)
+					this.input.push(x);
+				current = "";
+			} else {
+				current += c;
+			}
+		}
 	}	
+	
+	get_output(){
+		return this.output;
+	}
+	
 	parse_code(code){
 		/* split the code to lines */
 		var lines = code.split('\n');
@@ -322,7 +475,8 @@ class ram_machine {
 		/* set code to parsed lines and proper entry point */
 		this.code = lines;
 		this.entry = lines[0].length == 0 ? this.next_line[0] : 0;
-		console.log(lines)
+
+		return {status: "ok"};
 	}
 }
 
@@ -360,4 +514,3 @@ end:	write 2
 console.log("Test 2");
 console.log(RAM.parse_code(code2));
 console.log("")
-
