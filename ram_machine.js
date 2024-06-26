@@ -1,16 +1,20 @@
-const RAM_DEFAULT_CACHE_SIZE = 10;
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  RAM Machine interpreter in JavaScript
+*/
+const RAM_DEFAULT_CACHE_SIZE = 10n;
 const RAM_DEFAULT_EVENTS_TIMES = {
-	"runtime_error": 10,
+	"runtime_error": 2,
 	"get_value": 1,
-	"move_cache": 5,
-	"read": 10,
-	"write": 10,
+	"move_cache": 3,
+	"read": 5,
+	"write": 5,
 	"store": 1,
 	"load": 1,
 	"add": 1,
 	"sub": 1,
-	"mult": 3,
-	"div": 5,
+	"mult": 2,
+	"div": 4,
 	"jump": 2,
 	"checkgtz": 1,
 	"checkzero": 1,
@@ -34,7 +38,7 @@ class ram_machine {
 			output     -- produced output
 
 			event_times  -- time it takes for each operation to complete
-			cache_size         -- cache size
+			cache_size   -- cache size
 			
 		# constants and settings #
 		
@@ -60,7 +64,7 @@ class ram_machine {
 			set_input    -- set input
 			get_output   -- get produced output
 			run_one_step -- runs one step and returns what happend
-			checks_limit -- checks if code will end in specified amount of instructions
+			run_checks   -- checks if code will end in specified amount of time
 			run_full     -- runs code and produces output
 
 		# inside functions #
@@ -95,7 +99,7 @@ class ram_machine {
 		this.input  = [];
 		this.output = [];
 
-		this.cache_size = RAM_DEFAULT_CACHE_SIZE;
+		this.cache_size = BigInt(RAM_DEFAULT_CACHE_SIZE);
 		this.event_times = RAM_DEFAULT_EVENTS_TIMES;
 	}
 
@@ -104,7 +108,7 @@ class ram_machine {
 		this.memory   = [];
 		this.input_p  = 0;
 		this.output   = [];
-		this.cache_p  = 1;
+		this.cache_p  = 1n;
 	}
 	
 	int64orBigInt(x){
@@ -127,6 +131,7 @@ class ram_machine {
 		for (var i=this.cache_p; i<this.cache_p + this.cache_size; i++){
 			res.push([i, this.get_value(i)]);
 		}
+		return res;
 	}
 	
 	adjust_cache(x){
@@ -134,8 +139,8 @@ class ram_machine {
 		if (x == 0 || (this.cache_p <= x && x < this.cache_p + this.cache_size)){
 			return [];
 		} else {
-			this.cache_p = (x - (x-1)%this.cache_size);
-			return [{event: "move_cache", page_state: get_page_state()}];
+			this.cache_p = (x - (x-1n)%this.cache_size);
+			return [{event: "move_cache", page_state: this.get_page_state()}];
 		}
 	}
 
@@ -181,11 +186,11 @@ class ram_machine {
 		this.memory_counter = this.memory_counter > cell ? this.memory_counter : cell;
 
 		/* adjust cache and read memory content */
-		for (var e of this.adjust_cache(cell))	events.push_back(e);
+		for (var e of this.adjust_cache(cell))	events.push(e);
 		events.push({event: "get_value", from: cell});
 		var value = this.get_value(cell);
 		if (value == undefined) {
-			events.push({event: "runtime_error", details: "read undefined value"})
+			events.push({event: "runtime_error", details: "read undefined value", line: this.ip})
 			return {result: undefined, events: events};
 		} else {
 			return {result: value, events: events};
@@ -328,7 +333,35 @@ class ram_machine {
 		}
 		
 	}
-	
+
+	run_full(extra_time_limit){
+		do {
+			var status = RAM.run_one_step();
+			if (this.time_counter > this.time_limit)
+				return {status: "timeout"};
+
+			if (this.time_counter > extra_time_limit)
+				return {status: "timeout_extra"};
+
+			if (this.instruction_counter > this.instruction_limit)
+				return {status: "insout"};
+
+			if (this.memory_counter > this.memory_counter)
+				return {status: "memout"};
+
+			if (status.status == "re")
+				return {status: "re", details: status.events[status.events.length-1]};
+
+			console.log(status);
+			for (var e of status.events)
+				if (e.event == "move_cache")
+					console.log(e.page_state);
+
+		} while (status.status == "ok");
+
+		return {status: "ok"};
+	}
+
 	set_input(s){
 		/* parses the input to BigInts */
 		var separators = {' ': 1, '\t': 1, '\r': 1, '\n': 1};
@@ -557,7 +590,7 @@ class ram_machine {
 			/* some helper functions */
 			var is_number = ((s) => {
 				for (var i of s)
-					if (!('0' <= i && i <= '9'))
+					if (!('0' <= i && i <= '9') && i != '-')
 						return false;
 				return true;
 			});
@@ -567,7 +600,7 @@ class ram_machine {
 			var is_address = (s) => {
 				return s[0] == '^' && is_number(s.substr(1, s.length-1));
 			};
-			
+
 			var has_number   = is_number(line[1]);
 			var has_constant = is_constant(line[1]);
 			var has_address  = is_address(line[1]);
@@ -610,6 +643,9 @@ class ram_machine {
 	}
 }
 
+/* TESTS */
+
+/*
 var RAM = new ram_machine();
 
 var code1 = `
@@ -663,9 +699,166 @@ do {
 	console.log("status: ", status);
 } while (status.status == "ok");
 
+console.log(RAM.run_full(Infinity))
 console.log(RAM.get_output())
 console.log("")
 
 console.log("instructions: ", RAM.instruction_counter);
 console.log("max memory:   ", RAM.memory_counter);
 console.log("time counter: ", RAM.time_counter);
+
+
+var code3 = `           read  1         #a
+           read  2
+           load  =0
+           store 13
+           load  =500
+           store 10
+           load  =1
+           store 9
+potega2:   load  9
+           mult  =2
+           store 9
+           load  10
+           sub   =1
+           store 10
+           jgtz  potega2
+           load  =500
+           store 10
+petla2:    load  2
+           sub   9
+           jgtz  binarny
+           jzero binarny
+petla22:   load  9
+           div   =2
+           store 9
+           load  10
+           sub   =1
+           store 10
+           jzero petla2
+           jgtz  petla2
+           jump  koniec2
+binarny:   store 2
+           load  10
+           store 11
+           load  =1
+           store 12
+binarny10: load  11
+           jzero koniec10
+           sub   =1
+           store 11
+           load  12
+           mult  =10
+           store 12
+           jump  binarny10
+koniec10:  load  12
+           add   13
+           store 13
+           jump  petla22
+koniec2:   read  3         #c
+           load  =1
+           store 9         #potega liczona
+           store 10        #potegi a
+           load  13
+           jzero konieclol #czy b == 0
+           load  10
+           mult  1         #a^1
+           store 10
+           div   3
+           mult  3
+           sub   10
+           mult  =-1
+           store 10        #a % c
+           load  13
+           div   =10
+           mult  =10
+           sub   13
+           jzero dalejmno
+           load  9         #zapis binarny - 1 (jest)
+           mult  10
+           store 9
+           div   3
+           mult  3
+           sub   9
+           mult  =-1
+           store 9
+dalejmno:  load  13
+           div   =10
+           jzero konieclol
+           store 13
+           load  10
+           mult  10        #potegowanie poteg a
+           store 10
+           div   3
+           mult  3
+           sub   10
+           mult  =-1
+           store 10        #a % c
+           load  13
+           div   =10
+           mult  =10
+           sub   13
+           jzero dalejmno
+           load  9         #zapis binarny - 1 (jest)
+           mult  10
+           store 9
+           div   3
+           mult  3
+           sub   9
+           mult  =-1
+           store 9
+           jump  dalejmno
+konieclol: write 9`;
+
+var code4 = `
+	read 1
+	load =0
+	store 2
+
+loop1:	
+	load 2
+	sub 1	
+	jzero loop2
+
+		load 2
+		add =10
+
+		store 3
+		read ^3
+
+		load 2
+		add =1
+		store 2
+	
+	jump loop1
+	
+loop2:
+
+	load 2
+	jzero end
+
+		load 2
+		sub =1
+		store 2
+
+		load 2
+		add =10
+		store 3
+		write ^3
+
+
+	jump loop2
+end:
+
+`;
+
+console.log(RAM.parse_code(code4));
+console.log(RAM.clear_state());
+console.log(RAM.set_input("5 1 2 3 4 5"));
+console.log(RAM.run_full());
+console.log(RAM.get_output())
+
+console.log("instructions: ", RAM.instruction_counter);
+console.log("max memory:   ", RAM.memory_counter);
+console.log("time counter: ", RAM.time_counter);
+*/
