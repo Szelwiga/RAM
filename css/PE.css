@@ -52,7 +52,7 @@
 	overflow-x:  hidden;
 
 	scrollbar-width:          thin;
-	scrollbar-color:          var(--light_purple) var(--gray);
+	scrollbar-color:          var(--dark_purple) var(--gray);
 	scrikkbar-margin-bottom:  10px;
 }
 

@@ -10,7 +10,6 @@ var PE_last_update  = 0;
 var PE_is_launched  = 0;
 var PE_green_frame_timeout = 2000;
 
-
 /* outside dedicated functions */
 function PE_set_up(){
 	/* creates PE HTML on webpage */
@@ -24,6 +23,7 @@ function PE_set_up(){
 			</div>
 		</div>
 	`;
+	PE_is_launched = 1;
 }
 
 function PE_get_code(){
@@ -57,17 +57,7 @@ function PE_highlight_line(line_number){
 	var text  = document.getElementById("PE-highlighting-content").innerHTML;
 	var lines = text.split("<br>");
 
-
-	var line = lines[line_number - 1];
-	
-	line = line.split("display:inline;");
-	if (line.length == 1)
-		line = "<p style=\"background-color:var(--dark_red);display:inline;\">" + line[0] + "</p>";
-	else 
-		line[0] += "background-color:var(--dark_red);";
-		line     = line.join("display:inline;");
-
-	lines[line_number - 1] = line;
+	lines[line_number - 1] = "<span style=\"background-color:var(--dark_red);display:inline;\">" + lines[line_number - 1] + "</span>";
 	var text  = document.getElementById("PE-highlighting-content").innerHTML = lines.join("<br>");
 }
 
@@ -114,7 +104,7 @@ function PE_editor_update(text){
 
 function PE_editor_gen_html(text, color){
 	/* generates colored line html */
-	return "<p style=\"color:var(" + color + ");display:inline;\">" + text + "</p>";
+	return "<span style=\"color:var(" + color + ");display:inline;\">" + text + "</span>";
 }
 
 function PE_editor_color_html(text){
@@ -147,6 +137,15 @@ function PE_editor_color_html(text){
 	for (var i of style)
 		text = text.replaceAll(i[0], PE_editor_gen_html(i[0], i[1]));
 
+	/* color comments */
+	var lines = text.split("<br>");
+
+	for (var i = 0; i < lines.length; i++)
+		if (lines[i][0] == '#')
+			lines[i] = PE_editor_gen_html(lines[i], "--light_aqua");
+
+	text = lines.join("<br>");
+
 	return text;
 }
 
@@ -178,5 +177,4 @@ function PE_check_tab(element, event){
 		PE_editor_update(element.value);
 	}
 }
-
 
