@@ -1,5 +1,4 @@
 
-
 #GE-editor-frame{
 	position: absolute;
 	margin:   1.25vh;
@@ -24,7 +23,7 @@
 
 	font-size:    15pt;
 	font-family:  monospace;
-	line-height:  18pt;
+	line-height:  16pt;
 
 	word-spacing:  normal;
 	word-break:    normal;
@@ -42,6 +41,7 @@
 	
 .GE-row {
 	font-family:  monospace;
+	margin: 0%;
 	margin-left:     2%;
 	margin-right:    2%;
 	width:     96%;
@@ -68,8 +68,9 @@
 	color: #FFFFFF;
 	border-bottom: solid 0.01vh var(--dark_gray);
 }
+
 #GE-editor-frame input::placeholder { 
-	color: var(--placeholder);
+/*	color: var(--dark_gray);*/
 	opacity: 1;
 }
 
@@ -92,8 +93,10 @@
 }
 
 #GE-editor-frame hr {
-	border-color: var(--gray);
+/*	border-color: var(--dark_gray);*/
+	border-color: #7A6D63;
 	width: 96%;
+	margin: 1%;
 	margin-right: 2%;
 	margin-left: 2%;
 }

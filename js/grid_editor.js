@@ -47,11 +47,12 @@ function GE_set_up(){
 		</div>
 		
 	`;
-	GE_fix_html();
+	GE_reformat();
 	
 	GE_is_launched = 1;
 	PE_is_launched = 0;
 }
+
 function GE_gen_id(s){
 	return s + GE_id_ptr++;
 }
@@ -124,7 +125,7 @@ function GE_set_cache(){
 }
 
 function GE_get_code(){
-
+	var result = "";
 	var code = document.getElementById("GE-code");
 	for (var row of code.children) {
 		if (row.className == "GE-row") {
@@ -146,10 +147,18 @@ function GE_get_code(){
 					linenumber  = GE_get_elem_value(row_item);
 				}
 			}
-//			console.log(linenumber + ": " + label + " " + instruction + " " + argument + " #" + comment);
+			if (is_comment) {
+				result += "# " + comment;
+			} else {
+				if (label != ""       && label != undefined)       result += label + ": ";
+				if (instruction != "" && instruction != undefined) result += instruction + " ";
+				if (argument != ""    && argument != undefined)    result += argument;
+			}
+
+			result += "\n";
 		}
 	}
-
+	return result;
 }
 
 function GE_try_set_focus(r, c){
@@ -290,10 +299,10 @@ function GE_flip_line_type(elem_id){
 		row.replaceChild(comment_elem, repl);
 		GE_try_set_focus(linenumber, 1);
 	}
-	GE_fix_html();
+	GE_reformat();
 }
 
-function GE_fix_html(){
+function GE_reformat(){
 
 	var code = document.getElementById("GE-code");
 	var linenumber = 0;
@@ -311,42 +320,80 @@ function GE_fix_html(){
 					let arg = row.id;
 					row_item.onclick = function() { GE_flip_line_type(arg) };
 				}
+
+			for (var row_item of row.children)
+				if (row_item.className != "GE-comment" && row_item.nodeName == "INPUT")
+					row_item.value = row_item.value.trim();
+
+			for (var row_item of row.children)
+				if (row_item.nodeName == "INPUT")
+					row_item.spellcheck = false;
 		}	
 	}
 	GE_line_cnt = linenumber - 1;
 
 	/* color the world */
 	
-	var colors = [
-		["read", "--blue"],
-		["write", "--blue"],
+	var colors = {
+		"read": "--blue",
+		"write": "--blue",
 
-		["load", "--yellow"],
-		["store", "--yellow"],
+		"load": "--yellow",
+		"store": "--yellow",
 
-		["add", "--green"],
-		["sub", "--green"],
-		["mult", "--green"],
-		["div", "--green"],
+		"add": "--green",
+		"sub": "--green",
+		"mult": "--green",
+		"div": "--green",
 
-		["jump", "--red"],
-		["jgtz", "--red"],
-		["jzero", "--red"],
+		"jump": "--red",
+		"jgtz": "--red",
+		"jzero": "--red",
 
-		["halt", "--orange"]
-	];
+		"halt": "--orange",
+	};
 
 	for (var row of code.children) {
 		if (row.className == "GE-row") {
 			for (var row_item of row.children) {
-				/* TODO */
+
+				var remove_placeholders = false;
+
+				for (var row_item of row.children) {
+					if (row_item.className == "GE-comment") {
+					
+						var comment = GE_get_elem_value(row_item);
+						if (comment != undefined && comment != "")
+							row_item.style.color = "var(--aqua)";
+					
+					} else if (row_item.className == "GE-instruction") {
+
+						instruction = GE_get_elem_value(row_item);
+						if (instruction in colors)
+							row_item.style.color = "var(" + colors[instruction] + ")";
+						else
+							row_item.style.color = "white";
+
+					}
+					if (row_item.className in GE_input_classes)
+						if (GE_get_elem_value(row_item) != undefined && GE_get_elem_value(row_item) != "")
+							remove_placeholders = true;
+
+				}
+
+				for (var row_item of row.children)
+					if (row_item.className in GE_input_classes) {
+						if (remove_placeholders) row_item.placeholder = "";
+						else                     row_item.placeholder = row_item.className.replace("GE-", "");
+					}
+
 			}
 		}
 	}
 }
 function GE_append_last_line(){
 	GE_append_line(GE_line_cnt);
-	GE_fix_html();
+	GE_reformat();
 }
 
 function GE_delete_line(line){
@@ -377,9 +424,37 @@ function GE_delete_line(line){
 	}
 }
 
+function GE_lock(){
+	/* locks editor editing */
+	GE_is_locked    = true;
+	GE_locked_code  = GE_get_code();
+	document.getElementById("GE-editor-frame").style.borderColor = "var(--dark_red)";
+
+	var code = document.getElementById("GE-code");
+	for (var row of code.children)
+		if (row.className == "GE-row")
+			for (var row_item of row.children)
+				if (row_item.className in GE_input_classes)
+					row_item.readOnly = true;
+}
+
+function GE_unlock(){
+	/* unlocks editor editing */
+	GE_is_locked = false;
+	document.getElementById("GE-editor-frame").style.borderColor = "var(--gray)";
+
+	var code = document.getElementById("GE-code");
+	for (var row of code.children)
+		if (row.className == "GE-row")
+			for (var row_item of row.children)
+				if (row_item.className in GE_input_classes)
+					row_item.readOnly = false;
+}
+
 document.addEventListener("keydown", function GE_navigator(event) {	
 	if (!GE_is_launched)	return;
 	if (!GE_check_focus())	return;
+	if (GE_is_locked)		return;
 
 	var pos = GE_get_focused_pos();
 	var focused_elem = document.activeElement;
@@ -409,13 +484,15 @@ document.addEventListener("keydown", function GE_navigator(event) {
 	
 	if (event.key == "Enter") {
 		GE_append_line(pos.row);
-		GE_fix_html();
-		GE_try_set_focus(pos.row+1, pos.col);
+		GE_reformat();
+		GE_try_set_focus(pos.row+1, 2);
 	}
 
-	if ((event.key == "Backspace" || event.key == "Delete") && event.ctrlKey) {
+	if ((event.key == "Delete" && (event.ctrlKey || event.altKey))
+	     || (event.key == "Backspace" && event.altKey)) {
+
 		GE_delete_line(pos.row);
-		GE_fix_html();
+		GE_reformat();
 		GE_try_set_focus(pos.row-1, pos.col);
 		GE_try_set_focus(pos.row, pos.col);
 	}
@@ -423,10 +500,8 @@ document.addEventListener("keydown", function GE_navigator(event) {
 	if ((event.key == "3" || event.key == "#") && event.altKey)
 		GE_flip_line_type(focused_elem.parentElement.id);
 
-//	console.log(event.key);
-
 	GE_last_update = Date.now();
-	GE_fix_html();
+	GE_reformat();
 	GE_set_cache();
 });
 
