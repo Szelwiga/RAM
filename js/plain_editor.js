@@ -23,7 +23,8 @@ function PE_set_up(){
 			</div>
 		</div>
 	`;
-	PE_is_launched = 1;
+	PE_is_launched = true;
+	GE_is_launched = false;
 }
 
 function PE_get_code(){

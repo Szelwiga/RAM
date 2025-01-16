@@ -1,3 +1,5 @@
+
+
 #GE-editor-frame{
 	position: absolute;
 	margin:   1.25vh;
@@ -24,7 +26,6 @@
 	font-family:  monospace;
 	line-height:  18pt;
 
-/*	white-space:   pre;*/
 	word-spacing:  normal;
 	word-break:    normal;
 	word-wrap:     normal;
@@ -67,14 +68,20 @@
 	color: #FFFFFF;
 	border-bottom: solid 0.01vh var(--dark_gray);
 }
+#GE-editor-frame input::placeholder { 
+	color: var(--placeholder);
+	opacity: 1;
+}
 
 .GE-comment-btn {
 	background-color: var(--black);
 	border: solid 0.2vh var(--gray);
 	color: var(--gray);
+
 	display: flex;
 	justify-content: center;
 	algin-items: center;
+	font-size: 14pt;
 	width: 18pt;	
 	height: 18pt;
 	padding: 0px;
