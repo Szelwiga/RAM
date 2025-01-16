@@ -37,23 +37,24 @@
 
 	--white:        #fbf1c7;
 }
+
 body {
-	font-family: 'Montserrat', sans-serif;
-	font-weight: 300;
-	font-size: 14px;
+	font-family:      'Montserrat', sans-serif;
+	font-weight:      300;
+	font-size:        14px;
 	background-color: var(--black);
-	color: #ffffff;
+	color:            #ffffff;
 }
 
 
 .wrapper .left,
 .wrapper .right {
-	width: 100%;
-	height: 50vh;
-	position: relative;
-	overflow: hidden;
-	display: flex;
-	align-items: center;
+	width:           100%;
+	height:          47.5vh;
+	position:        relative;
+	overflow:        hidden;
+	display:         flex;
+	align-items:     center;
 	justify-content: center;
 }
 
@@ -64,13 +65,88 @@ body {
 	}
 
 	.wrapper .left {
-		width: 40%;
-		height: 100vh;
+		width:  40%;
+		height: 95vh;
 	
 	}
 	.wrapper .right {
-		width: 60%;
-		height: 100vh;
+		width:  60%;
+		height: 95vh;
 	}
 }
 
+.top-bar {
+	overflow: hidden;
+	height:   4.5vh;
+
+	padding-top:    0.5vh;
+	padding-bottom: 0vh;
+	padding-left:   1vh;
+	padding-right:  1vh;
+}
+
+.top-bar .top-bar-left {
+	float: left;
+	display: flex;
+	align-items:     left;
+	justify-content: left;
+}
+
+.top-bar .top-bar-right {
+	float: right;
+	display: flex;
+	align-items:     right;
+	justify-content: right;
+}
+
+.top-bar button {
+	margin-bottom: 0vh;
+	margin-top:    1vh;
+	margin-left:   0.25vh;
+	margin-right:  0.25vh;
+	height:        3.5vh;
+	width:         3.5vh;
+	font-size:     2vh;
+	padding:       0px;
+
+	display:         inline-block;
+	align-items:     center;
+	justify-content: center;
+
+	transition-duration: 0.5s;
+	background-color:    var(--black);
+	border-color:        var(--gray);
+	border:              solid 0.25vh;
+	color:               var(--gray);
+}
+
+.top-bar .blue-btn:hover {
+	background-color: var(--dark_blue);
+}
+.top-bar .orange-btn:hover {
+	background-color: var(--dark_orange);
+}
+.top-bar .green-btn:hover {
+	background-color: var(--dark_green);
+}
+.top-bar .yellow-btn:hover {
+	background-color: var(--dark_yellow);
+}
+
+.top-bar .icon {
+	margin-left: 0.12vh;
+	height:      2.5vh;
+}
+
+.top-bar .sep {
+	margin-bottom: 0vh;
+	margin-top:    1vh;
+	margin-left:   2.5vh;
+	margin-right:  2.5vh;
+	padding:       0px;
+
+	width:   0vh;
+	height:  3.15vh;
+	border:  solid 0.16vh;
+	color:   var(--gray);
+}

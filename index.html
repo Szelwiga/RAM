@@ -12,14 +12,44 @@
 		<script src="js/ram_machine.js"> </script>
 	</head>
 	<body>
-		<div class="wrapper">
-			<div class="left" id="left-div">
+		<div class="top-bar" id="top-bar">
+			<div class="top-bar-left">
+
+				<button class="orange-btn" onclick="BTN_code_run()">      <img class="icon" src="svg/run2.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_run_step()"> <img class="icon" src="svg/runstep.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_stop()">     <img class="icon" src="svg/stop2.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_run_full()"> <img class="icon" src="svg/runfull.svg"/> </button>
+
+				<div class="sep"></div>
+
+				<button class="blue-btn" onclick="BTN_editor_download()"> <img class="icon" src="svg/download2.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_editor_new()">      <img class="icon" src="svg/new.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_editor_delete()">   <img class="icon" src="svg/delete1.svg"/> </button>
+
+				<div class="sep"></div>
+
+				<div class="top-bar-left" id="codes_btns">
+				<button class="green-btn" onclick=""> 1 </button>
+				</div>
+
 			</div>
+			<div class="top-bar-right">
+
+				<button class="yellow-btn" onclick="BTN_animator()">  <img class="icon" src="svg/robot.svg"/> </button>
+				<button class="yellow-btn" onclick="BTN_levels()">    <img class="icon" src="svg/tasks.svg"/> </button>
+				<button class="yellow-btn" onclick="BTN_settings()">  <img class="icon" src="svg/settings.svg"/> </button>
+
+			</div>
+		</div>
+
+		<div class="wrapper">
+			<div class="left" id="left-div"></div>
 			
 			<div class="right">
 				<img src="https://www.w3schools.com/images/w3schools_green.jpg">
 			</div>
 		</div>
+
 	<script> PE_set_up(); </script>
 	</body>
 </html>

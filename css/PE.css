@@ -1,12 +1,12 @@
 #PE-editor-frame{
 	position: absolute;
-	margin:   2%;
+	margin:   1.25vh;
 	top:      0;
 	left:     0;
-	border:   solid;
+	border:   solid 0.25vh;
 
-	border-size:  2px;
-	border-color: var(--gray);
+	border-color:   var(--gray);
+	transition:     border-color 2s ease-in-out;
 
 	width:          96%;
 	height:         96%;
@@ -72,7 +72,7 @@
 	tab-size:      4;
 }
 
-//textarea { outline: none !important; }
+/*//textarea { outline: none !important; }*/
 
 #PE-editor, #PE-highlighting {
 	position: absolute;

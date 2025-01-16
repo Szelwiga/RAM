@@ -140,10 +140,17 @@ function PE_editor_color_html(text){
 	/* color comments */
 	var lines = text.split("<br>");
 
-	for (var i = 0; i < lines.length; i++)
-		if (lines[i][0] == '#')
-			lines[i] = PE_editor_gen_html(lines[i], "--light_aqua");
+	for (var i = 0; i < lines.length; i++) {
+		var line = lines[i];
+		var x = line.search('#');
+		if (x == -1)
+			continue;
 
+		var prefix = line.substr(0, x);
+		var suffix = line.substr(x, line.length-x);
+
+		lines[i] = prefix + PE_editor_gen_html(suffix, "--light_aqua");
+	}
 	text = lines.join("<br>");
 
 	return text;
