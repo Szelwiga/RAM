@@ -1,0 +1,92 @@
+#GE-editor-frame{
+	position: absolute;
+	margin:   1.25vh;
+	top:      0;
+	left:     0;
+	border:   solid 0.25vh;
+
+	border-color:   var(--gray);
+	transition:     border-color 2s ease-in-out;
+
+	width:          96%;
+	height:         96%;
+
+	display:     block;
+	algin-items: top;
+
+	overflow-x:  hidden;
+
+	scrollbar-width:          thin;
+	scrollbar-color:          var(--dark_purple) var(--gray);
+	scrikkbar-margin-bottom:  10px;
+
+	font-size:    15pt;
+	font-family:  monospace;
+	line-height:  18pt;
+
+/*	white-space:   pre;*/
+	word-spacing:  normal;
+	word-break:    normal;
+	word-wrap:     normal;
+
+	-moz-tab-size: 4;
+	-o-tab-size:   4;
+	tab-size:      4;
+}
+
+#GE-code {
+	padding-top: 1vh;
+	padding-bottom: 1vh;
+}
+	
+.GE-row {
+	font-family:  monospace;
+	margin-left:     2%;
+	margin-right:    2%;
+	width:     96%;
+	display:   flex;
+	height:    18pt;
+}
+
+.GE-linenumber {
+	height: 100%;
+	color: var(--light_black);
+	display:   flex;
+	justify-content: left;
+	width: 10%;
+}
+.GE-comment { width: 95%; }
+.GE-label { width: 24%; }
+.GE-instruction { width: 33%; }
+.GE-argument { width: 33%; }
+.GE-sep { width: 1%; }
+
+#GE-editor-frame input { 
+	background-color: var(--black);
+	border: none;
+	color: #FFFFFF;
+	border-bottom: solid 0.01vh var(--dark_gray);
+}
+
+.GE-comment-btn {
+	background-color: var(--black);
+	border: solid 0.2vh var(--gray);
+	color: var(--gray);
+	display: flex;
+	justify-content: center;
+	algin-items: center;
+	width: 18pt;	
+	height: 18pt;
+	padding: 0px;
+	transition-duration: 0.5s;
+}
+.GE-comment-btn:hover {
+	background-color: var(--dark_aqua);
+}
+
+#GE-editor-frame hr {
+	border-color: var(--gray);
+	width: 96%;
+	margin-right: 2%;
+	margin-left: 2%;
+}

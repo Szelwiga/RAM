@@ -1,5 +1,5 @@
 /*
-	The code makes plain text editor (PE) work propertly
+	This code is responsible for interacting with plain editor
 */
 
 /* globals of PE */

@@ -121,10 +121,10 @@ body {
 }
 
 .top-bar .blue-btn:hover {
-	background-color: var(--dark_blue);
+	background-color: var(--blue);
 }
 .top-bar .orange-btn:hover {
-	background-color: var(--dark_orange);
+	background-color: var(--orange);
 }
 .top-bar .green-btn:hover {
 	background-color: var(--dark_green);
