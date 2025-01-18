@@ -42,7 +42,7 @@ function GE_set_up(){
 					<button class="GE-comment-btn">#</button>
 				</div>
 				<hr>
-				<div class="GE-row"><button class="GE-comment-btn" onclick="GE_append_last_line()">v</button></div>
+				<div class="GE-row"><button id="GE-new-line" class="GE-comment-btn" onclick="GE_append_last_line()">v</button></div>
 			</div>
 		</div>
 		
@@ -124,6 +124,49 @@ function GE_set_cache(){
 
 }
 
+function GE_paste_code(text){
+	lines = text.split('\n');
+
+	var new_lines = [];
+	for (var line of lines) {
+		line = line.trim();
+		if (line[0] != '#' && line.search('#') != -1) {
+			line = line.split('#');
+			new_lines.push(line.shift());
+			new_lines.push('#' + line.join('#'));
+		} else {
+			new_lines.push(line);
+		}
+	}
+	lines = new_lines;
+	for (var line of lines) line = line.trim();
+
+	while (GE_line_cnt > 1)            { GE_delete_line(2); GE_reformat(); }
+	while (GE_line_cnt < lines.length) { GE_append_last_line(); GE_reformat(); }
+	GE_append_last_line(); GE_delete_line(1); GE_reformat();
+
+	for (var i = 1; i <= GE_line_cnt; i++)
+		GE_flip_line_type(undefined, i);
+	GE_reformat();
+
+	var code = document.getElementById("GE-code");
+	for (var row of code.children) 
+		if (row.className == "GE-row")
+			for (var row_item of row.children)
+				if (row_item.className == "GE-comment")
+					row_item.value = lines.shift();
+
+	for (var row of code.children)
+		if (row.className == "GE-row")
+			for (var row_item of row.children)
+				if (row_item.className == "GE-comment") {
+					if (row_item.value[0] != '#') GE_flip_line_type(row.id);
+					else                          row_item.value = row_item.value.substr(1).trim();
+				}
+	
+	GE_reformat();
+}
+
 function GE_get_code(){
 	var result = "";
 	var code = document.getElementById("GE-code");
@@ -131,9 +174,11 @@ function GE_get_code(){
 		if (row.className == "GE-row") {
 
 			var is_comment = false;
-			var linenumber, instruction, comment, argument, label;
+			var linenumber = undefined, instruction = undefined, comment = undefined, argument = undefined, label = undefined;
 
 			for (var row_item of row.children) {
+				if (row_item.id == "GE-new-line")
+					return result.substr(0, result.length - 1);
 				if (row_item.className == "GE-comment") {
 					is_comment  = true;
 					comment     = GE_get_elem_value(row_item);
@@ -147,6 +192,7 @@ function GE_get_code(){
 					linenumber  = GE_get_elem_value(row_item);
 				}
 			}
+
 			if (is_comment) {
 				result += "# " + comment;
 			} else {
@@ -154,11 +200,9 @@ function GE_get_code(){
 				if (instruction != "" && instruction != undefined) result += instruction + " ";
 				if (argument != ""    && argument != undefined)    result += argument;
 			}
-
 			result += "\n";
 		}
 	}
-	return result;
 }
 
 function GE_try_set_focus(r, c){
@@ -212,8 +256,17 @@ function GE_append_line(line){
 	}
 }
 
-function GE_flip_line_type(elem_id){
+function GE_flip_line_type(elem_id, ln){
 	var code = document.getElementById("GE-code");
+	if (elem_id == undefined) {
+		for (var row of code.children) {
+			for (var row_item of row.children)
+				if (row_item.className == "GE-linenumber")
+					if (GE_get_elem_value(row_item) == ln)
+						elem_id = row.id;
+		}
+	}
+	
 	var row = document.getElementById(elem_id);
 
 	var is_comment = false;

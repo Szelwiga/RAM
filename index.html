@@ -9,11 +9,14 @@
 		<link href="css/plain_editor.css" rel="stylesheet">
 		<link href="css/grid_editor.css" rel="stylesheet">
 
+		<script src="js/settings.js"> </script>
 		<script src="js/plain_editor.js"> </script>
 		<script src="js/grid_editor.js"> </script>
+		<script src="js/editors_api.js"> </script>
 		<script src="js/ram_machine.js"> </script>
 	</head>
 	<body>
+		<input type="file" id="EA_code_uploader" hidden onchange="EA_load_file()">
 		<div class="top-bar" id="top-bar">
 			<div class="top-bar-left">
 
@@ -24,8 +27,9 @@
 
 				<div class="sep"></div>
 
-				<button class="blue-btn" onclick="BTN_copy()">            <img class="icon" src="svg/copy2.svg"/> </button>
 				<button class="blue-btn" onclick="BTN_editor_download()"> <img class="icon" src="svg/download2.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_copy()">            <img class="icon" src="svg/copy2.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_editor_upload()">   <img class="icon" src="svg/upload2.svg"/> </button>
 				<button class="blue-btn" onclick="BTN_editor_new()">      <img class="icon" src="svg/new.svg"/> </button>
 				<button class="blue-btn" onclick="BTN_editor_delete()">   <img class="icon" src="svg/delete1.svg"/> </button>
 
@@ -54,8 +58,7 @@
 		</div>
 
 	<script>
-		// PE_set_up();
-		GE_set_up();
+		EA_init(1);
 	</script>
 	</body>
 </html>
