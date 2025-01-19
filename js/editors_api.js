@@ -7,6 +7,7 @@ function EA_choose_localfile(x) {
 	EA_paste_code(EA_localfiles[x]);
 	EA_current_localfile = x;
 	EA_regenerate_buttons();
+	N_notify("opened file " + x)
 }
 
 function EA_init(x) {
@@ -57,9 +58,10 @@ function EA_regenerate_buttons(){
 }
 
 function BTN_editor_download() {
+	var filename = "ram_code_" + EA_current_localfile + ".txt";
 	var dl_elem = document.createElement("a");
 	dl_elem.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(EA_get_code()));
-	dl_elem.setAttribute("download", "ram_code_" + EA_current_localfile + ".txt");
+	dl_elem.setAttribute("download", filename);
 
 	dl_elem.style.display = "none";
 	document.body.appendChild(dl_elem);
@@ -67,11 +69,12 @@ function BTN_editor_download() {
 	dl_elem.click();
 
 	document.body.removeChild(dl_elem);
+	N_notify("saved");
 }
 
 function BTN_copy() {
 	navigator.clipboard.writeText(EA_get_code());
-	/* TODO notify */
+	N_notify("copied to clipboard");
 }
 
 function BTN_editor_upload() {
@@ -79,7 +82,7 @@ function BTN_editor_upload() {
 }
 async function EA_load_file(){
 	EA_paste_code(await document.getElementById("EA_code_uploader").files[0].text());
-	/* TODO notify */
+	N_notify("opened file");
 }
 
 function BTN_editor_new() {
@@ -87,21 +90,30 @@ function BTN_editor_new() {
 	var i = 1;
 	while (i in EA_localfiles) i++;
 	EA_init(i);
-	/* TODO */
+	N_notify("file " + i + " created");
 }
 
+var BTN_delete_time = 0;
 function BTN_editor_delete() {
 	if (Object.keys(EA_localfiles).length == 1) {
-		/* TODO notify warning */
+		N_warn("cannot delete last file");
 		return;
 	}
-	/* TODO make sure */
+
+	if (BTN_delete_time + N_warning_duration < Date.now()) {
+		N_warn("click again to confirm");
+		BTN_delete_time = Date.now();
+		return;
+	}
+	BTN_delete_time = 0;
+
 	for (var i in EA_localfiles) {
 		if (i != EA_current_localfile) {
 			var to_remove = EA_current_localfile;
 			EA_choose_localfile(i);
 			delete EA_localfiles[to_remove];
 			EA_regenerate_buttons();
+			N_notify("deleted file " + to_remove);
 			return;
 		}
 	}
