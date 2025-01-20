@@ -145,11 +145,14 @@ function GE_paste_code(text){
 	while (GE_line_cnt < lines.length) { GE_append_last_line(); GE_reformat(); }
 	GE_append_last_line(); GE_delete_line(1); GE_reformat();
 
-	for (var i = 1; i <= GE_line_cnt; i++)
-		GE_flip_line_type(undefined, i);
-	GE_reformat();
-
 	var code = document.getElementById("GE-code");
+	for (var row of code.children) 
+		if (row.className == "GE-row")
+			for (var row_item of row.children)
+				if (row_item.className == "GE-linenumber")
+					if (1 <= GE_get_elem_value(row_item) && GE_get_elem_value(row_item) <= GE_line_cnt)
+						GE_flip_line_type(row.id);
+
 	for (var row of code.children) 
 		if (row.className == "GE-row")
 			for (var row_item of row.children)

@@ -78,8 +78,8 @@ body {
 }
 
 .top-bar {
-	overflow: hidden;
-	height:   4.5vh;
+	overflow:   hidden;
+	min-height: 4.5vh;
 
 	padding-top:    0.5vh;
 	padding-bottom: 0vh;
