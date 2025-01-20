@@ -91,8 +91,29 @@
 	color:         var(--white);
 
 	flex-grow:     1;
-	margin:  2%;
-	margin-top: 0%;
+	margin:        2%;
+	margin-top:    0%;
 	margin-bottom: 0%;
 	height:        100%;
+
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+#PS-frame pre {
+	padding:       2%;
+	font-family:   monospace;
+	font-size:     1.5vw;
+	line-height:   1.7vw;
+	background:    var(--black);
+	color:         var(--white);
+	caret-color:   var(--white);
+}
+
+@media screen and (min-width:1200px) {
+	#PS-frame pre {
+		font-size:     3vh;
+		line-height:   3.3vh;
+	}
 }
