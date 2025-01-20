@@ -17,6 +17,7 @@
 		<script src="js/editors_api.js"> </script>
 		<script src="js/ram_machine.js"> </script>
 		<script src="js/pure_simulator.js"> </script>
+		<script src="js/driver.js"> </script>
 	</head>
 	<body>
 		<input type="file" id="EA_code_uploader" hidden onchange="EA_load_file()">
@@ -62,8 +63,7 @@
 	<div id="N-warn" hidden></div>
 
 	<script>
-		EA_init(1);
-		PS_init();
+		D_global_init();
 	</script>
 	</body>
 </html>

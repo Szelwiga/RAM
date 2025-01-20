@@ -5,11 +5,11 @@
 	left:     0;
 	border:   solid 0.25vh;
 
-	border-color:   var(--gray);
-	transition:     border-color 2s ease-in-out;
+	border-color: var(--gray);
+	transition:   border-color 2s ease-in-out;
 
-	width:          96%;
-	height:         96%;
+	width:  96%;
+	height: 96%;
 
 	display:        flex;
 	flex-direction: column;
@@ -17,13 +17,13 @@
 
 	overflow: hidden;
 
-	font-size:    15pt;
-	font-family:  monospace;
-	line-height:  16pt;
+	font-size:   15pt;
+	font-family: monospace;
+	line-height: 16pt;
 
-	word-spacing:  normal;
-	word-break:    normal;
-	word-wrap:     normal;
+	word-spacing: normal;
+	word-break:   normal;
+	word-wrap:    normal;
 
 	-moz-tab-size: 4;
 	-o-tab-size:   4;
@@ -43,19 +43,19 @@
 	margin:  2%;
 	padding: 2%;
 
-	scrollbar-width:          thin;
-	scrollbar-color:          var(--dark_purple) var(--gray);
-	scrollbar-margin-bottom:  10px;
+	scrollbar-width:         thin;
+	scrollbar-color:         var(--dark_purple) var(--gray);
+	scrollbar-margin-bottom: 10px;
 
     height:    auto;
     flex-grow: 1;
 	width:     96%;
 
-	resize:        none;
-	border:        0.125vh solid var(--gray);
-	background:    var(--black);
-	color:         var(--white);
-	caret-color:   var(--white);
+	resize:      none;
+	border:      0.125vh solid var(--gray);
+	background:  var(--black);
+	color:       var(--white);
+	caret-color: var(--white);
 }
 
 #PS-memory {
@@ -65,30 +65,56 @@
 	height: 23%;
 	width:  92%;
 
-	border:        0.125vh solid var(--gray);
-	background:    var(--black);
-	color:         var(--white);
+	border:     0.125vh solid var(--gray);
+	background: var(--black);
+	color:      var(--white);
+
+	display:         flex;
+	justify-content: center;
+	align-items:     center;
+}
+
+#PS-memory-left, #PS-memory-right {
+	border:     0.125vh solid var(--gray);
+	background: var(--black);
+	color:      var(--white);
+
+	font-size: 30pt;
+	height:    100%;
+	width:     20pt;
+
+	display:         flex;
+	justify-content: center;
+	align-items:     center;
+
+	transition-duration: 0.5s;
+}
+
+#PS-memory button:hover{
+	background: var(--green);
+}
+#PS-memory-cells-box {
+	flex-grow: 1;
+	height:    100%;
 }
 
 .PS-triple {
-	margin-left: 2%;
 	margin:  2%;
 	padding: 0%;
-	padding-top: 0%;
 
 	height: 23%;
 	width:  96%;
 
-	display:        flex;
-	flex-direction: row;
-	align-items: stretch;
+	display:         flex;
+	flex-direction:  row;
+	align-items:     stretch;
     justify-content: space-between;
 }
 
 .PS-instruction, .PS-counters, .PS-alu {
-	border:        0.125vh solid var(--gray);
-	background:    var(--black);
-	color:         var(--white);
+	border:     0.125vh solid var(--gray);
+	background: var(--black);
+	color:      var(--white);
 
 	flex-grow:     1;
 	margin:        2%;
@@ -96,24 +122,49 @@
 	margin-bottom: 0%;
 	height:        100%;
 
-	display: flex;
+	display:         flex;
 	justify-content: center;
-	align-items: center;
+	align-items:     center;
 }
 
 #PS-frame pre {
-	padding:       2%;
-	font-family:   monospace;
-	font-size:     1.5vw;
-	line-height:   1.7vw;
-	background:    var(--black);
-	color:         var(--white);
-	caret-color:   var(--white);
+	padding:     2%;
+	font-family: monospace;
+	font-size:   1.5vw;
+	line-height: 1.7vw;
+	color:       var(--white);
+	caret-color: var(--white);
 }
 
 @media screen and (min-width:1200px) {
 	#PS-frame pre {
-		font-size:     3vh;
-		line-height:   3.3vh;
+		font-size:   min(3vh, 17pt);
+		line-height: min(3.3vh, 19pt);
 	}
+}
+
+.PS-memory-cells-box {
+	position: relative;
+
+	display:         flex;
+	justify-content: center;
+	align-items:     center;
+	align-content:   center;
+	flex-wrap:       wrap;
+	margin: 0%;
+}
+
+.PS-memory-cell {
+	position:   relative;
+	flex-grow:  1;
+	min-width:  10%;
+
+	flex: 1 1 0px;
+
+	display:         flex;
+	justify-content: center;
+	align-items:     center;
+	margin: 2%;
+
+	border:      0.125vh solid var(--gray);
 }

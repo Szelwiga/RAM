@@ -95,6 +95,17 @@ body {
 	justify-content: left;
 }
 
+#codes_btns{
+	display:    inline-block;
+	max-width:  max(8vw, calc(100vw - 65vh));
+	overflow-y: auto;
+	max-height: 4.5vh;
+
+	scrollbar-width:          thin;
+	scrollbar-color:          var(--dark_purple) var(--gray);
+	scrollbar-margin-bottom:  10px;
+}
+
 .top-bar .top-bar-right {
 	float: right;
 	display: flex;
