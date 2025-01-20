@@ -207,23 +207,24 @@ class ram_machine {
 		/* runs one step of simulation and returns what happend */
 		if (this.code[this.ip] == undefined || this.code[this.ip][0] == undefined){
 			var events = [{event: "halt"}];
-			return {status: "done", events: events};
+			return {status: "done", events: events, ins: ""};
 		}
 
 		var events      = [];
 		var instruction = this.code[this.ip][0];
 		var argument    = this.code[this.ip][1];
+		var line        = instruction + " " + argument;
 
 		this.instruction_counter++;
 		if (instruction == "read") {
 			/* the read instruction */
 			var res = this.resolve_addr(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events};
+				return {status: "re", events: res.events, ins: line};
 			}
 			if (this.input_p == this.input.length){
 				res.events.push({event: "runtime_error", details: "attempting to read with empty input"})
-				return {status: "re", events: res.events};
+				return {status: "re", events: res.events, ins: line};
 			}
 
 			this.memory[res.result] = this.int64orBigInt(this.input[this.input_p++]);
@@ -231,13 +232,13 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events};
+			return {status: "ok", events: res.events, ins: line};
 			
 		} else if (instruction == "write"){
 			/* the write instruction */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events};
+				return {status: "re", events: res.events, ins: line};
 			}
 
 			this.output.push(res.result);
@@ -245,13 +246,13 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events};
+			return {status: "ok", events: res.events, ins: line};
 			
 		} else if (instruction == "load"){
 			/* the load instruction */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events};
+				return {status: "re", events: res.events, ins: line};
 			}
 
 			this.memory[0] = this.int64orBigInt(res.result);
@@ -259,13 +260,13 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events};
+			return {status: "ok", events: res.events, ins: line};
 			
 		} else if (instruction == "store"){
 			/* the store instruction */
 			var res = this.resolve_addr(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events};
+				return {status: "re", events: res.events, ins: line};
 			}
 
 			this.memory[res.result] = this.memory[0];
@@ -273,14 +274,14 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events};
+			return {status: "ok", events: res.events, ins: line};
 						
 		} else if (instruction == "add"  || instruction == "sub" || 
 		           instruction == "mult" || instruction == "div"){
 			/* the alu instructions */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events};
+				return {status: "re", events: res.events, ins: line};
 			}
 			if (instruction == "add"){
 				this.memory[0] = this.int64orBigInt(this.memory[0] + res.result);
@@ -301,7 +302,7 @@ class ram_machine {
 			
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events};
+			return {status: "ok", events: res.events, ins: line};
 			
 		} else if (instruction == "jump" || instruction == "jzero" || instruction == "jgtz"){
 			/* the jumps instructions */
@@ -325,11 +326,11 @@ class ram_machine {
 				this.ip = this.next_line[this.ip];
 			}
 			this.update_time_counter(events);
-			return {status: "ok", events: events};
+			return {status: "ok", events: events, ins: line};
 			
 		} else if (instruction == "halt"){
 			var events = [{event: "halt"}];
-			return {status: "done", events: events};
+			return {status: "done", events: events, ins: line};
 		}
 		
 	}

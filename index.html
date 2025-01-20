@@ -8,6 +8,7 @@
 		<link href="css/style.css" rel="stylesheet">
 		<link href="css/plain_editor.css" rel="stylesheet">
 		<link href="css/grid_editor.css" rel="stylesheet">
+		<link href="css/pure_simulator.css" rel="stylesheet">
 
 		<script src="js/settings.js"> </script>
 		<script src="js/notify.js"> </script>
@@ -15,6 +16,7 @@
 		<script src="js/grid_editor.js"> </script>
 		<script src="js/editors_api.js"> </script>
 		<script src="js/ram_machine.js"> </script>
+		<script src="js/pure_simulator.js"> </script>
 	</head>
 	<body>
 		<input type="file" id="EA_code_uploader" hidden onchange="EA_load_file()">
@@ -52,10 +54,7 @@
 
 		<div class="wrapper">
 			<div class="left" id="left-div"></div>
-			
-			<div class="right">
-				<img src="https://www.w3schools.com/images/w3schools_green.jpg">
-			</div>
+			<div class="right" id="right-div"></div>
 		</div>
 
 	<div id="N-notify" hidden></div>
@@ -64,6 +63,7 @@
 
 	<script>
 		EA_init(1);
+		PS_init();
 	</script>
 	</body>
 </html>
