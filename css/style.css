@@ -61,7 +61,7 @@ body {
 }
 
 
-@media screen and (min-width:900px) {
+@media screen and (min-width:1200px) {
 	.wrapper {
 		display: flex;
 	}
@@ -90,6 +90,7 @@ body {
 .top-bar .top-bar-left {
 	float: left;
 	display: flex;
+	flex-wrap: wrap;
 	align-items:     left;
 	justify-content: left;
 }

@@ -1,6 +1,6 @@
 
 #GE-editor-frame{
-	position: absolute;
+	position: relative;
 	margin:   1.25vh;
 	top:      0;
 	left:     0;
@@ -19,7 +19,7 @@
 
 	scrollbar-width:          thin;
 	scrollbar-color:          var(--dark_purple) var(--gray);
-	scrikkbar-margin-bottom:  10px;
+	scrollbar-margin-bottom:  10px;
 
 	font-size:    15pt;
 	font-family:  monospace;

@@ -1,5 +1,5 @@
 #PE-editor-frame{
-	position: absolute;
+	position: relative;
 	margin:   1.25vh;
 	top:      0;
 	left:     0;
@@ -53,7 +53,7 @@
 
 	scrollbar-width:          thin;
 	scrollbar-color:          var(--dark_purple) var(--gray);
-	scrikkbar-margin-bottom:  10px;
+	scrollbar-margin-bottom:  10px;
 }
 
 #PE-editor, #PE-highlighting, #PE-highlighting *, #PE-linenumbers-pre, #PE-linenumbers-pre * {
@@ -71,8 +71,6 @@
 	-o-tab-size:   4;
 	tab-size:      4;
 }
-
-/*//textarea { outline: none !important; }*/
 
 #PE-editor, #PE-highlighting {
 	position: absolute;
