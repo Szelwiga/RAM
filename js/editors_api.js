@@ -7,7 +7,7 @@ function EA_choose_localfile(x) {
 	EA_paste_code(EA_localfiles[x]);
 	EA_current_localfile = x;
 	EA_regenerate_buttons();
-	N_notify("Opened file " + x)
+	N_notify("Opened file " + x);
 }
 
 function EA_init(x) {
@@ -37,6 +37,16 @@ function EA_lock() {
 function EA_unlock() {
 	if (EA_current_editor == "GE") GE_unlock();
 	else                           PE_unlock();
+}
+
+function EA_highlight_line(x){
+	if (EA_current_editor == "GE") GE_highlight_line(x);
+	else                           PE_highlight_line(x);
+}
+
+function EA_clear_highlight(x){
+	if (EA_current_editor == "GE") GE_clear_highlight(x);
+	else                           PE_clear_highlight(x);
 }
 
 function EA_regenerate_buttons(){

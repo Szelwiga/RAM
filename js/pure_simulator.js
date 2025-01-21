@@ -7,7 +7,7 @@ function PS_color(text, color) {
 function PS_set_counters(mem, time, ins) {
 	var text = "<pre>";
 	if (window.innerWidth >= G_min_width_viewport) {
-		text += "Counters<br>"
+		text += "Counters         <br>"
 		text += "Instructions: " + ins + "<br>";
 		text += "Time:         " + time + "<br>";
 		text += "Memory:       " + mem + "<br>";
@@ -27,46 +27,51 @@ function PS_set_counters(mem, time, ins) {
 	document.getElementById("PS-counters").innerHTML = text;
 }
 
-function PS_set_alu(value, state, error) {
+function PS_set_alu(value, error) {
+	if (value == undefined) value = "?";
 	text = "<pre>";
 	if (window.innerWidth >= G_min_width_viewport) {
-		text += "Accumulator<br>";
+		text += "Accumulator      <br>";
 		text += "Value: " + value + "<br>";
-		text += "State: " + state + "<br>";
-		if (error != "" && error != undefined)
-			text += "Error: " + error;
-		else
-			text += "<br>";
+		if (error)
+			text += PS_color("ERROR", "--red");
 		text += "</pre>";
-	} else {
-		var line1 = "Accumulator  ";
-		var line2 = "State: " + state + "  ";
-
-		while (line2.length < line1.length) line2 += " ";
-		while (line2.length > line1.length) line1 += " ";
-
-		line1 += "Value: " + value + "<br>";
-		if (error != "" && error != undefined)
-			line2 += "Error: " + error;
-
-		text += line1 + line2 + "</pre>";
-	}
+	} 
 	text = text.replaceAll("Accumulator", PS_color("<b>Accumulator</b>", "--light_orange"));
 	document.getElementById("PS-alu").innerHTML = text;
 }
 
-function PS_set_instruction(instruction, event) {
+function PS_set_instruction(instruction) {
 
 	var text = "<pre>";
-	text += "Instruction <br>";
+	text += "Instruction  <br>";
 	text += instruction + "<br>";
-	if (event != "" && event != undefined)
-		text += "Event: " + event + "<br><br>";
-	else
-		text += "<br><br>"
 	text += "</pre>";
 
 	text = text.replaceAll("Instruction", PS_color("<b>Instruction</b>", "--light_red"));
+
+	var style = [
+		["read", "--blue"],
+		["write", "--blue"],
+
+		["load", "--yellow"],
+		["store", "--yellow"],
+
+		["add", "--green"],
+		["sub", "--green"],
+		["mult", "--green"],
+		["div", "--green"],
+
+		["jump", "--red"],
+		["jgtz", "--red"],
+		["jzero", "--red"],
+
+		["halt", "--orange"]
+	];
+
+	for (var i of style)
+		text = text.replaceAll(i[0], PS_color(i[0], i[1]));
+
 	document.getElementById("PS-instruction").innerHTML = text;
 }
 
@@ -76,6 +81,8 @@ function PS_set_output(text) {
 
 function PS_set_memory(mem) {
 	var cell_box = document.getElementById("PS-memory-cells-box");
+
+	cell_box.innerHTML = "";
 	for (var mem_cell of mem) {
 		var cell = document.createElement("PRE");
 
@@ -89,8 +96,8 @@ function PS_set_memory(mem) {
 
 function PS_clear() {
 	PS_set_counters(0, 0, 0);
-	PS_set_alu(0, "inactive", "");
-	PS_set_instruction("", "");
+	PS_set_alu(0, "");
+	PS_set_instruction("");
 	PS_set_output("");
 
 	var mem = [];
@@ -126,5 +133,15 @@ function PS_init(){
 		</div>
 	`;
 	PS_is_launched = 1;
+	DS_is_launched = 0;
 	PS_clear();
+}
+
+function PS_set_frame_color(color) {
+	document.getElementById("PS-frame").style.borderColor = color;
+}
+
+function PS_color_output(color) {
+	document.getElementById("PS-output").style.borderColor = color;
+	document.getElementById("PS-output").style.color       = color;
 }

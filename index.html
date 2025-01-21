@@ -17,6 +17,8 @@
 		<script src="js/editors_api.js"> </script>
 		<script src="js/ram_machine.js"> </script>
 		<script src="js/pure_simulator.js"> </script>
+		<script src="js/detailed_simulator.js"> </script>
+		<script src="js/simulators_api.js"> </script>
 		<script src="js/driver.js"> </script>
 	</head>
 	<body>
@@ -24,9 +26,9 @@
 		<div class="top-bar" id="top-bar">
 			<div class="top-bar-left">
 
-				<button class="orange-btn" onclick="BTN_code_run()" onmouseover='N_info("Run")' onmouseout="N_info_clear()"> <img class="icon" src="svg/run2.svg"/> </button>
-				<button class="orange-btn" onclick="BTN_code_run_step()" onmouseover='N_info("Run one step")' onmouseout="N_info_clear()"> <img class="icon" src="svg/runstep.svg"/> </button>
-				<button class="orange-btn" onclick="BTN_code_stop()" onmouseover='N_info("Stop")' onmouseout="N_info_clear()"> <img class="icon" src="svg/stop2.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_run()" onmouseover='N_info("Load code to simulator / Run")' onmouseout="N_info_clear()"> <img class="icon" src="svg/run2.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_run_step()" onmouseover='N_info("Load code to simulator / Run one step")' onmouseout="N_info_clear()"> <img class="icon" src="svg/runstep.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_stop()" onmouseover='N_info("Exit simulator / Stop")' onmouseout="N_info_clear()"> <img class="icon" src="svg/stop2.svg"/> </button>
 				<button class="orange-btn" onclick="BTN_code_run_full()" onmouseover='N_info("Run at maximum speed")' onmouseout="N_info_clear()"> <img class="icon" src="svg/runfull.svg"/> </button>
 
 				<div class="sep"></div>
@@ -48,7 +50,7 @@
 
 				<button class="yellow-btn" onclick="BTN_animator()" onmouseover='N_info("Simulator")' onmouseout="N_info_clear()"> <img class="icon" src="svg/robot.svg"/> </button>
 				<button class="yellow-btn" onclick="BTN_levels()" onmouseover='N_info("Levels")' onmouseout="N_info_clear()"> <img class="icon" src="svg/tasks.svg"/> </button>
-				<button class="yellow-btn" onclick="BTN_settings()" onmouseover='N_info("Settings")' onmouseout="N_info_clear()"> <img class="icon" src="svg/settings.svg"/> </button>
+				<button class="yellow-btn" onclick="BTN_settings()" onmouseover='N_info("Settings / Help")' onmouseout="N_info_clear()"> <img class="icon" src="svg/settings.svg"/> </button>
 
 			</div>
 		</div>

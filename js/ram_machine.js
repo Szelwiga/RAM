@@ -99,7 +99,7 @@ class ram_machine {
 		this.input  = [];
 		this.output = [];
 
-		this.cache_size = BigInt(RAM_DEFAULT_CACHE_SIZE);
+		this.cache_size  = BigInt(RAM_DEFAULT_CACHE_SIZE);
 		this.event_times = RAM_DEFAULT_EVENTS_TIMES;
 	}
 
@@ -109,6 +109,10 @@ class ram_machine {
 		this.input_p  = 0;
 		this.output   = [];
 		this.cache_p  = 1n;
+
+		this.instruction_counter = 0;
+		this.time_counter        = 0;
+		this.memory_counter      = 0;
 	}
 	
 	int64orBigInt(x){
@@ -125,10 +129,14 @@ class ram_machine {
 		return this.memory[x] == undefined ? (this.zero_fill ? 0 : undefined) : this.memory[x];
 	}
 
-	get_page_state(){
+	get_page_state(x){
 		/* returns current cache state */
+		var P = BigInt(this.cache_p);
+		if (x != undefined)
+			P = (x - (x-1n)%this.cache_size);
+
 		var res = [];
-		for (var i=this.cache_p; i<this.cache_p + this.cache_size; i++){
+		for (var i=P; i<P + this.cache_size; i++){
 			res.push([i, this.get_value(i)]);
 		}
 		return res;
@@ -220,11 +228,11 @@ class ram_machine {
 			/* the read instruction */
 			var res = this.resolve_addr(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line};
+				return {status: "re", events: res.events, ins: line, line: this.ip};
 			}
 			if (this.input_p == this.input.length){
-				res.events.push({event: "runtime_error", details: "attempting to read with empty input"})
-				return {status: "re", events: res.events, ins: line};
+				res.events.push({event: "runtime_error", details: "attempting to read with empty input", line: this.ip});
+				return {status: "re", events: res.events, ins: line, line: this.ip};
 			}
 
 			this.memory[res.result] = this.int64orBigInt(this.input[this.input_p++]);
@@ -232,13 +240,13 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line};
+			return {status: "ok", events: res.events, ins: line, line: this.ip};
 			
 		} else if (instruction == "write"){
 			/* the write instruction */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line};
+				return {status: "re", events: res.events, ins: line, line: this.ip};
 			}
 
 			this.output.push(res.result);
@@ -246,13 +254,13 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line};
+			return {status: "ok", events: res.events, ins: line, line: this.ip};
 			
 		} else if (instruction == "load"){
 			/* the load instruction */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line};
+				return {status: "re", events: res.events, ins: line, line: this.ip};
 			}
 
 			this.memory[0] = this.int64orBigInt(res.result);
@@ -260,13 +268,13 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line};
+			return {status: "ok", events: res.events, ins: line, line: this.ip};
 			
 		} else if (instruction == "store"){
 			/* the store instruction */
 			var res = this.resolve_addr(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line};
+				return {status: "re", events: res.events, ins: line, line: this.ip};
 			}
 
 			this.memory[res.result] = this.memory[0];
@@ -274,14 +282,14 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line};
+			return {status: "ok", events: res.events, ins: line, line: this.ip};
 						
 		} else if (instruction == "add"  || instruction == "sub" || 
 		           instruction == "mult" || instruction == "div"){
 			/* the alu instructions */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line};
+				return {status: "re", events: res.events, ins: line, line: this.ip};
 			}
 			if (instruction == "add"){
 				this.memory[0] = this.int64orBigInt(this.memory[0] + res.result);
@@ -296,13 +304,17 @@ class ram_machine {
 				res.events.push({event: "mult", value: res.result, new_value: this.memory[0]});
 
 			} else if (instruction == "div"){
+				if (res.result == 0n) {
+					res.events.push({event: "runtime_error", details: "division by zero"})
+					return {status: "re", events: res.events, ins: line, line: this.ip};
+				}
 				this.memory[0] = this.int64orBigInt(this.memory[0] / res.result);
 				res.events.push({event: "div",  value: res.result, new_value: this.memory[0]});
 			}
 			
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line};
+			return {status: "ok", events: res.events, ins: line, line: this.ip};
 			
 		} else if (instruction == "jump" || instruction == "jzero" || instruction == "jgtz"){
 			/* the jumps instructions */
@@ -326,11 +338,11 @@ class ram_machine {
 				this.ip = this.next_line[this.ip];
 			}
 			this.update_time_counter(events);
-			return {status: "ok", events: events, ins: line};
+			return {status: "ok", events: events, ins: line, line: this.ip};
 			
 		} else if (instruction == "halt"){
 			var events = [{event: "halt"}];
-			return {status: "done", events: events, ins: line};
+			return {status: "done", events: events, ins: line, line: this.ip};
 		}
 		
 	}
@@ -353,10 +365,10 @@ class ram_machine {
 			if (status.status == "re")
 				return {status: "re", details: status.events[status.events.length-1]};
 
-			console.log(status);
-			for (var e of status.events)
-				if (e.event == "move_cache")
-					console.log(e.page_state);
+//			console.log(status);
+//			for (var e of status.events)
+//				if (e.event == "move_cache")
+//					console.log(e.page_state);
 
 		} while (status.status == "ok");
 
@@ -374,6 +386,8 @@ class ram_machine {
 				var x, fail = 0;
 				try {
 					x = BigInt(current);
+					if (current == "")
+						fail = true;
 				} catch(e) {
 					for (var cc of current)
 						this.input.push(BigInt(cc.charCodeAt(0)));

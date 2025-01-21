@@ -480,6 +480,32 @@ function GE_delete_line(line){
 	}
 }
 
+function GE_clear_highlight(){
+	var code = document.getElementById("GE-code");
+	for (var row of code.children) {
+		if (row.className == "GE-row") {
+			for (var row_item of row.children)
+				row_item.style.background = "var(--black)";
+			row.style.background = "var(--black)";
+		}
+	}
+}
+function GE_highlight_line(x){
+	GE_clear_highlight();
+	var code = document.getElementById("GE-code");
+	for (var row of code.children) {
+		if (row.className == "GE-row") {
+			var color = false;
+			for (var row_item of row.children) {
+				if (row_item.className == "GE-linenumber" && GE_get_elem_value(row_item) == x)
+					color = true;
+				if (color) row_item.style.background = "var(--dark_red)";
+			}
+			if (color) row.style.background = "var(--dark_red)";
+		}
+	}
+}
+
 function GE_lock(){
 	/* locks editor editing */
 	GE_is_locked    = true;

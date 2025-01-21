@@ -51,8 +51,13 @@ function PE_unlock(){
 	document.getElementById("PE-editor-frame").style.borderColor = "var(--gray)";
 }
 
+function PE_clear_highlight(){
+	PE_editor_update(PE_get_code(), true);
+}
+
 function PE_highlight_line(line_number){
 	/* highlights given linenumber in PE editor */
+	PE_clear_highlight();
 	if (line_number == 0)	return;
 
 	var text  = document.getElementById("PE-highlighting-content").innerHTML;
@@ -77,12 +82,12 @@ function PE_update_frame_color(){
 }
 setInterval(PE_update_frame_color, 100);
 
-function PE_editor_update(text){
+function PE_editor_update(text, omit_lock_check){
 
 	/* treats updates of textrea, expands newlines and colors keywords */
 	PE_last_update = Date.now();
 
-	if (PE_is_locked) {
+	if (PE_is_locked && !omit_lock_check) {
 		document.querySelector("#PE-editor").value = PE_locked_code;
 		return;
 	}
