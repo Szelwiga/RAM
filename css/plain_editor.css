@@ -6,7 +6,7 @@
 	border:   solid 0.25vh;
 
 	border-color:   var(--gray);
-	transition:     border-color 2s ease-in-out;
+	transition:     border-color 0.5s ease-in-out;
 
 	width:          96%;
 	height:         96%;

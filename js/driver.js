@@ -113,16 +113,13 @@ function BTN_code_run(){
 
 function BTN_code_stop() {
 	if (D_state == "running") {
-		if (D_running_state == "stopped") {
+		if (D_running_state == "stopped" || D_running_state == "noauto") {
 
 			D_state = "editing";
 			EA_unlock();
 			SA_color_output("var(--gray)");
 			SA_set_frame_color("var(--gray)");
-					
 
-		} else if (D_running_state == "noauto") {
-			D_running_state = "stopped";
 		} else if (D_running_state == "auto") {
 			D_running_state = "noauto";
 		}
