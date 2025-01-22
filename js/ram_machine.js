@@ -101,6 +101,9 @@ class ram_machine {
 
 		this.cache_size  = BigInt(RAM_DEFAULT_CACHE_SIZE);
 		this.event_times = RAM_DEFAULT_EVENTS_TIMES;
+
+
+		this.clear_state();
 	}
 
 	clear_state(){
@@ -198,7 +201,7 @@ class ram_machine {
 		events.push({event: "get_value", from: cell});
 		var value = this.get_value(cell);
 		if (value == undefined) {
-			events.push({event: "runtime_error", details: "read undefined value", line: this.ip})
+			events.push({event: "runtime_error", details: "read undefined value", line: curr_line})
 			return {result: undefined, events: events};
 		} else {
 			return {result: value, events: events};
@@ -222,31 +225,34 @@ class ram_machine {
 		var instruction = this.code[this.ip][0];
 		var argument    = this.code[this.ip][1];
 		var line        = instruction + " " + argument;
+		var curr_line   = this.ip;
 
 		this.instruction_counter++;
 		if (instruction == "read") {
 			/* the read instruction */
 			var res = this.resolve_addr(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line, line: this.ip};
+				return {status: "re", events: res.events, ins: line, line: curr_line};
 			}
 			if (this.input_p == this.input.length){
-				res.events.push({event: "runtime_error", details: "attempting to read with empty input", line: this.ip});
-				return {status: "re", events: res.events, ins: line, line: this.ip};
+				res.events.push({event: "runtime_error", details: "attempting to read with empty input", line: curr_line});
+				return {status: "re", events: res.events, ins: line, line: curr_line};
 			}
+
+			for (var e of this.adjust_cache(res.result))	res.events.push(e);
 
 			this.memory[res.result] = this.int64orBigInt(this.input[this.input_p++]);
 			res.events.push({event: "read", to: res.result, value: this.memory[res.result]});
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line, line: this.ip};
+			return {status: "ok", events: res.events, ins: line, line: curr_line};
 			
 		} else if (instruction == "write"){
 			/* the write instruction */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line, line: this.ip};
+				return {status: "re", events: res.events, ins: line, line: curr_line};
 			}
 
 			this.output.push(res.result);
@@ -254,13 +260,13 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line, line: this.ip};
+			return {status: "ok", events: res.events, ins: line, line: curr_line};
 			
 		} else if (instruction == "load"){
 			/* the load instruction */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line, line: this.ip};
+				return {status: "re", events: res.events, ins: line, line: curr_line};
 			}
 
 			this.memory[0] = this.int64orBigInt(res.result);
@@ -268,28 +274,30 @@ class ram_machine {
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line, line: this.ip};
+			return {status: "ok", events: res.events, ins: line, line: curr_line};
 			
 		} else if (instruction == "store"){
 			/* the store instruction */
 			var res = this.resolve_addr(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line, line: this.ip};
+				return {status: "re", events: res.events, ins: line, line: curr_line};
 			}
+
+			for (var e of this.adjust_cache(res.result))	res.events.push(e);
 
 			this.memory[res.result] = this.memory[0];
 			res.events.push({event: "store", value: this.memory[0], to: res.result});
 
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line, line: this.ip};
+			return {status: "ok", events: res.events, ins: line, line: curr_line};
 						
 		} else if (instruction == "add"  || instruction == "sub" || 
 		           instruction == "mult" || instruction == "div"){
 			/* the alu instructions */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
-				return {status: "re", events: res.events, ins: line, line: this.ip};
+				return {status: "re", events: res.events, ins: line, line: curr_line};
 			}
 			if (instruction == "add"){
 				this.memory[0] = this.int64orBigInt(this.memory[0] + res.result);
@@ -306,7 +314,7 @@ class ram_machine {
 			} else if (instruction == "div"){
 				if (res.result == 0n) {
 					res.events.push({event: "runtime_error", details: "division by zero"})
-					return {status: "re", events: res.events, ins: line, line: this.ip};
+					return {status: "re", events: res.events, ins: line, line: curr_line};
 				}
 				this.memory[0] = this.int64orBigInt(this.memory[0] / res.result);
 				res.events.push({event: "div",  value: res.result, new_value: this.memory[0]});
@@ -314,7 +322,7 @@ class ram_machine {
 			
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
-			return {status: "ok", events: res.events, ins: line, line: this.ip};
+			return {status: "ok", events: res.events, ins: line, line: curr_line};
 			
 		} else if (instruction == "jump" || instruction == "jzero" || instruction == "jgtz"){
 			/* the jumps instructions */
@@ -338,11 +346,11 @@ class ram_machine {
 				this.ip = this.next_line[this.ip];
 			}
 			this.update_time_counter(events);
-			return {status: "ok", events: events, ins: line, line: this.ip};
+			return {status: "ok", events: events, ins: line, line: curr_line};
 			
 		} else if (instruction == "halt"){
 			var events = [{event: "halt"}];
-			return {status: "done", events: events, ins: line, line: this.ip};
+			return {status: "done", events: events, ins: line, line: curr_line};
 		}
 		
 	}
@@ -404,7 +412,10 @@ class ram_machine {
 	}	
 	
 	get_output(){
-		return this.output;
+		var result = ""
+		for (var i of this.output)
+			result += i + " ";;
+		return result;
 	}
 	
 	parse_code(code){
@@ -611,7 +622,7 @@ class ram_machine {
 			});
 			var is_constant = (s) => {
 				return s[0] == '=' && is_number(s.substr(1, s.length-1));
-			};
+		};
 			var is_address = (s) => {
 				return s[0] == '^' && is_number(s.substr(1, s.length-1));
 			};

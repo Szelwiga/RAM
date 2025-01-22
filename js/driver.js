@@ -37,13 +37,18 @@ var D_state;
 var D_events = [];
 var D_current_result = undefined;
 var D_pressed_step = false;
+var D_animation_speeds_ps = [5, 10, 25, 50, 100, 250, 500, 1000, 2000, 2500];
+var D_animation_speed_index = S_get_animation_speed_index();
 
 function D_req_cache_next_page() {
-	N_notify("Not implemented!");
+	var t = BigInt(PS_current_mem[0][0]) + BigInt(RAM.cache_size);
+	PS_set_memory(RAM.get_page_state(t));
 }
 
 function D_req_cache_prev_page() {
-	N_notify("Not implemented!");
+	var t = BigInt(PS_current_mem[0][0]) - BigInt(RAM.cache_size);
+	if (t < 1n) t = 1n;
+	PS_set_memory(RAM.get_page_state(t));
 }
 
 function D_global_init() {
@@ -165,28 +170,40 @@ function BTN_code_run_full(){
 
 	if (result.status == "ok") {
 
-		SA_set_output(RAM.output);
+		SA_set_output(RAM.get_output());
 		PS_set_alu(RAM.memory[0], 0);
 
 	} else if (result.status == "re") {
 
-		SA_set_output(RAM.output + "\nRuntime error on line: " + (result.details.line + 1) + "\n" + result.details.details);
+		SA_set_output(RAM.get_output() + "\nRuntime error on line: " + (result.details.line + 1) + "\n" + result.details.details);
 		SA_color_output("var(--red)");
 		PS_set_alu(RAM.memory[0], 1);
 
 	} else {
 
-		SA_set_output(RAM.output + "\nLimit exceeded: " + result.status);
+		SA_set_output(RAM.get_output() + "\nLimit exceeded: " + result.status);
 		SA_color_output("var(--red)");
 		PS_set_alu(RAM.memory[0], 0);
 
 	}
 
 	PS_set_counters(RAM.memory_counter, RAM.time_counter, RAM.instruction_counter);
+	PS_set_memory(RAM.get_page_state());
 	N_notify("Executed at maximum speed");
 }
 
+var D_refresh_rate = 5;
+var D_counter = 0;
 function D_update(){
+	var mod;
+	if (PS_is_launched) mod = D_animation_speeds_ps[D_animation_speed_index];
+	else                mod = D_animation_speeds_ds[D_animation_speed_index];
+
+	D_counter += D_refresh_rate;
+	D_counter %= mod;
+
+	if (D_counter != 0) return;
+
 	if (D_state == "running" && (D_running_state == "auto" || D_running_state == "noauto")) {
 		if (D_events.length == 0) {
 			if (D_current_result != undefined && D_current_result.status != "ok") {
@@ -199,7 +216,7 @@ function D_update(){
 				var result = RAM.run_one_step();
 				D_pressed_step = false;
 
-				EA_highlight_line(result.line);
+				EA_highlight_line(result.line+1);
 
 				D_events         = [...result.events];
 				D_current_result = result;
@@ -210,4 +227,4 @@ function D_update(){
 	}
 }
 
-setInterval(D_update, 200);
+setInterval(D_update, 5);

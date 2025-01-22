@@ -1,4 +1,5 @@
 var PS_is_launched = 0;
+var PS_current_mem;
 
 function PS_color(text, color) {
 	 return "<span style=\"color:var(" + color + ");display:inline;\">" + text + "</span>";
@@ -31,7 +32,7 @@ function PS_set_alu(value, error) {
 	if (value == undefined) value = "?";
 	text = "<pre>";
 	if (window.innerWidth >= G_min_width_viewport) {
-		text += "Accumulator      <br>";
+		text += "Accumulator   <br>";
 		text += "Value: " + value + "<br>";
 		if (error)
 			text += PS_color("ERROR", "--red");
@@ -41,14 +42,7 @@ function PS_set_alu(value, error) {
 	document.getElementById("PS-alu").innerHTML = text;
 }
 
-function PS_set_instruction(instruction) {
-
-	var text = "<pre>";
-	text += "Instruction  <br>";
-	text += instruction + "<br>";
-	text += "</pre>";
-
-	text = text.replaceAll("Instruction", PS_color("<b>Instruction</b>", "--light_red"));
+function PS_set_instruction(instruction, event) {
 
 	var style = [
 		["read", "--blue"],
@@ -70,7 +64,16 @@ function PS_set_instruction(instruction) {
 	];
 
 	for (var i of style)
-		text = text.replaceAll(i[0], PS_color(i[0], i[1]));
+		instruction = instruction.replaceAll(i[0], PS_color(i[0], i[1]));
+
+	var text = "<pre>";
+	text += "Instruction         <br>";
+	text += instruction + "<br>";
+	if (event) text += "(" + event + ")";
+	else       text += "<br>"
+	text += "</pre>";
+
+	text = text.replaceAll("Instruction", PS_color("<b>Instruction</b>", "--light_red"));
 
 	document.getElementById("PS-instruction").innerHTML = text;
 }
@@ -81,30 +84,54 @@ function PS_set_output(text) {
 
 function PS_set_memory(mem) {
 	var cell_box = document.getElementById("PS-memory-cells-box");
+	PS_current_mem = [...mem];
+	for (var mem_cell of cell_box.children) {
 
-	cell_box.innerHTML = "";
-	for (var mem_cell of mem) {
-		var cell = document.createElement("PRE");
+		let M = mem.shift();
+		var new_value;
 
-		if (mem_cell[1] != undefined) cell.innerHTML = mem_cell[0] + ": " + mem_cell[1];
-		else                          cell.innerHTML = mem_cell[0] + ": ?";
-		cell.className = "PS-memory-cell"
+		if (M[1] != undefined) new_value = M[0] + ": " + M[1];
+		else                   new_value = M[0] + ": ?";
 
-		cell_box.appendChild(cell);
+		if (mem_cell.innerHTML != new_value) {
+			mem_cell.innerHTML = new_value;
+			mem_cell.id = "PS-memory-cell-" + M[0];
+			PS_highlight_cell(M[0], "var(--green)");
+		}
 	}
+}
+
+async function PS_highlight_cell(x, color) {
+	var E = document.getElementById("PS-memory-cell-" + x);
+
+	E.style.background = color;
+	await new Promise(r => setTimeout(r, 200));
+	E.style.background = "var(--black)";
 }
 
 function PS_clear() {
 	PS_set_counters(0, 0, 0);
 	PS_set_alu(0, "");
-	PS_set_instruction("");
+	PS_set_instruction("", "");
 	PS_set_output("");
 
-	var mem = [];
-	for (var i = 1; i <= RAM_DEFAULT_CACHE_SIZE; i++)
-		mem.push([i, undefined]);
-	PS_set_memory(mem);
+	var cell_box = document.getElementById("PS-memory-cells-box");
+	cell_box.innerHTML = "";
+
+	for (var i = 1; i <= RAM.cache_size; i++) {
+		var cell = document.createElement("PRE");
+		cell.innerHTML = i + ": ?";
+
+		cell.className = "PS-memory-cell";
+		cell.id = "PS-memory-cell-" + i;
+ 
+		cell_box.appendChild(cell);
+	}
 	
+	var mem = [];
+	for (var i = 1; i <= RAM.cache_size; i++)
+		mem.push([i, undefined]);
+	PS_current_mem = mem;
 }
 
 function PS_get_input() {
@@ -134,6 +161,7 @@ function PS_init(){
 	`;
 	PS_is_launched = 1;
 	DS_is_launched = 0;
+
 	PS_clear();
 }
 

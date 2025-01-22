@@ -155,9 +155,9 @@
 }
 
 .PS-memory-cell {
-	position:   relative;
-	flex-grow:  1;
-	min-width:  10%;
+	position:  relative;
+	flex-grow: 1;
+	min-width: 10%;
 
 	flex: 1 1 0px;
 
@@ -166,5 +166,7 @@
 	align-items:     center;
 	margin: 2%;
 
-	border:      0.125vh solid var(--gray);
+	border: 0.125vh solid var(--gray);
+
+	transition-duration: 0.200s;
 }
