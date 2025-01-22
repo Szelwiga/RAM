@@ -61,7 +61,7 @@ function D_global_init() {
 	EA_cook_ie_restore();
 
 	if (get_cookie("D_input"))
-		SA_set_input(get_cookie("D_input"));
+		SA_set_input(EA_code_decompress(get_cookie("D_input")));
 	D_state = "editing";
 }
 

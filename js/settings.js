@@ -138,9 +138,9 @@ window.onload = function() {
 		EA_cook_ie_codes();
 
 		if (D_state == "settings" || D_state == "levels") {
-			set_cookie("D_input", D_input_cache);
+			set_cookie("D_input", EA_code_compress(D_input_cache));
 		} else {
-			set_cookie("D_input", SA_get_input());
+			set_cookie("D_input", EA_code_compress(SA_get_input()));
 		}
 
 		var confirmationMessage = 'Open codes will disappear after this action.';

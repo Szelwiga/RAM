@@ -146,6 +146,15 @@ function BTN_editor_delete() {
 	
 }
 
+/* TODO This should be change to compression */
+function EA_code_compress(code){
+	return code.replaceAll("\n", "/ENTER").replaceAll(";", "/SEMICOLON");
+}
+
+function EA_code_decompress(code){
+	return code.replaceAll("/ENTER", "\n").replaceAll("/SEMICOLON", ";");
+	
+}
 function EA_split_code(code) {
 	var current = "";
 	var res = [];
@@ -171,7 +180,7 @@ function EA_cook_ie_codes() {
 	for (var i in EA_localfiles) {
 		codes_cnt++; 
 
-		var code = EA_split_code(EA_localfiles[i]);
+		var code = EA_split_code(EA_code_compress(EA_localfiles[i]));
 
 		var frag_cnt = 0;
 		for (var code_frag of code){
@@ -198,7 +207,7 @@ function EA_cook_ie_restore(){
 			j++;
 		}
 
-		EA_paste_code(code);
+		EA_paste_code(EA_code_decompress(code));
 	}
 	EA_choose_localfile(1);
 }
