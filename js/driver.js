@@ -54,13 +54,10 @@ function D_req_cache_prev_page() {
 
 function D_global_init() {
 	/* TODO */
+	S_init();
 	EA_init(1);
 	SA_init();
-	S_init();
 	D_state = "editing";
-
-	/* UNDO */
-	BTN_settings();
 }
 
 function sleep(ms) {
