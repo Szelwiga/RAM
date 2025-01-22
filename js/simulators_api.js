@@ -1,10 +1,25 @@
-var SA_curr_sim = S_get_preffered_simulator();
+var SA_curr_sim = S_get_simulator();
 var SA_time_cnt = 0;
 var SA_output   = "";
 
 function SA_init(){
 	if (SA_curr_sim == "PS") PS_init();
 	else                     DS_init();
+}
+
+function SA_is_launched(){
+	return PS_is_launched || DS_is_launched;
+}
+
+function SA_close(){
+	if (PS_is_launched) {
+		document.getElementById("right-div").innerHTML = "";
+		PS_is_launched = false;
+	}
+	if (DS_is_launched) {
+		document.getElementById("right-div").innerHTML = "";
+		DS_is_launched = false;
+	}
 }
 
 function SA_set_counters(mem, time, ins) {
@@ -34,6 +49,10 @@ function SA_clear() {
 function SA_get_input() {
 	if (SA_curr_sim == "PS") return PS_get_input();
 	else                     return DS_get_input();
+}
+function SA_set_input(inp) {
+	if (SA_curr_sim == "PS") return PS_set_input(inp);
+	else                     return DS_set_input(inp);
 }
 function SA_set_frame_color(color) {
 	if (SA_curr_sim == "PS") PS_set_frame_color(color);

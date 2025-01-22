@@ -38,12 +38,3 @@ function N_info(msg) {
 function N_info_clear(){
 	document.getElementById("N-info").style.visibility = "hidden";
 }
-
-/* TODO uncomment, */
-//window.onload = function() {
-//    window.addEventListener("beforeunload", function (e) {
-//        var confirmationMessage = 'Open codes will disappear after this action.'
-//        (e || window.event).returnValue = confirmationMessage;
-//        return confirmationMessage;
-//    });
-//};

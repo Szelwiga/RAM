@@ -1,0 +1,118 @@
+#S-frame{
+	position: relative;
+	margin:   1.25vh;
+	top:      0;
+	left:     0;
+	border:   solid 0.25vh;
+
+	border-color: var(--yellow);
+
+	width:  96%;
+	height: 96%;
+
+	display:         flex;
+	flex-direction:  column;
+	justify-content: center;
+	align-items:     center;
+
+	overflow: auto;
+
+	word-spacing: normal;
+	word-break:   normal;
+	word-wrap:    normal;
+
+	-moz-tab-size: 4;
+	-o-tab-size:   4;
+	tab-size:      4;
+
+	scrollbar-width:         thin;
+	scrollbar-color:         var(--dark_purple) var(--gray);
+	scrollbar-margin-bottom: 10px;
+}
+
+.S-title {
+	font-size:   30pt;
+	font-family: monospace;
+	line-height: 33pt;
+	color:       var(--white);
+}
+
+#S-frame hr {
+	border: 0.125vh solid var(--yellow);
+	width:  50%;
+	margin: 1%;
+}
+
+.S-option-title {
+	margin:      1%;
+	font-size:   20pt;
+	font-family: monospace;
+	line-height: 22pt;
+	color:       var(--white);
+}
+
+.S-description {
+	margin:      1%;
+	font-size:   15pt;
+	line-height: 18pt;
+	color:       var(--light_gray);
+	width:       65%;
+
+	display: inline;
+}
+
+.S-description pre{
+	display: inline;
+
+	color:            var(--gray);
+	background-color: var(--dark_black);
+
+	margin:        0;
+	padding:       2px 5px;
+	border-radius: 5px;
+}
+
+.S-flip-button {
+	height: 30pt;
+	width:  60pt;
+
+	font-size:   20pt;
+	font-family: monospace;
+	line-height: 22pt;
+
+	border:      0.225vh solid var(--yellow);
+	background:  var(--black);
+	color:       var(--white);
+
+	transition-duration: 0.5s;
+}
+.S-flip-button:hover {
+	background: var(--dark_orange);
+}
+
+.S-small-btn {
+	width:  15pt;
+	height: 15pt;
+	margin: 10pt 10pt;
+
+	border:      0.225vh solid var(--yellow);
+	background:  var(--black);
+
+	transition-duration: 0.5s;
+}
+.S-small-btn:hover {
+	background: var(--yellow);
+}
+
+#S-ins-limit {
+	font-size:   20pt;
+	font-family: monospace;
+	line-height: 22pt;
+
+	padding: 5px;
+
+	border:     0.225vh solid var(--yellow);
+	background: var(--black);
+	color:      var(--white);
+
+}

@@ -242,6 +242,8 @@ class ram_machine {
 			for (var e of this.adjust_cache(res.result))	res.events.push(e);
 
 			this.memory[res.result] = this.int64orBigInt(this.input[this.input_p++]);
+			this.memory_counter = this.memory_counter > res.result ? this.memory_counter : res.result;
+
 			res.events.push({event: "read", to: res.result, value: this.memory[res.result]});
 
 			this.ip = this.next_line[this.ip];
@@ -286,6 +288,8 @@ class ram_machine {
 			for (var e of this.adjust_cache(res.result))	res.events.push(e);
 
 			this.memory[res.result] = this.memory[0];
+			this.memory_counter = this.memory_counter > res.result ? this.memory_counter : res.result;
+
 			res.events.push({event: "store", value: this.memory[0], to: res.result});
 
 			this.ip = this.next_line[this.ip];

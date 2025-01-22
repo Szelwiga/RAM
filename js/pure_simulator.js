@@ -138,6 +138,10 @@ function PS_get_input() {
 	return document.getElementById("PS-input").value;
 }
 
+function PS_set_input(inp) {
+	return document.getElementById("PS-input").value = inp;
+}
+
 function PS_init(){
 	var elem = document.getElementById("right-div");
 	elem.innerHTML = `

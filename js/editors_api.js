@@ -1,6 +1,20 @@
 var EA_localfiles        = {};
-var EA_current_editor    = S_get_preffered_editor();
+var EA_current_editor    = S_get_editor();
 var EA_current_localfile = 0;
+
+function EA_choose_editor(editor){
+	if (EA_current_editor == editor) return;
+	if (editor == "GE") {
+		var code = PE_get_code();
+		GE_set_up();
+		GE_paste_code(code);
+	} else {
+		var code = GE_get_code();
+		PE_set_up();
+		PE_paste_code(code);
+	}
+	EA_current_editor = editor;
+}
 
 function EA_choose_localfile(x) {
 	EA_localfiles[EA_current_localfile] = EA_get_code();
