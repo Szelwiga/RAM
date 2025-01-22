@@ -128,19 +128,19 @@ function S_BTN_simulator() {
 }
 
 /* TODO uncomment, */
-//window.onload = function() {
-//    window.addEventListener("beforeunload", function (e) {
-//
-//		set_cookie("S_editor",     S_editor);
-//		set_cookie("S_simulator",  S_simulator);
-//		set_cookie("S_anim_speed", S_anim_speed);
-//		set_cookie("S_ins_limit",  S_ins_limit);
-//
-//		/* TODO save codes and input in cookies */
-//		/* TODO check if code is not to large to fit in cookie */
-//
-//		var confirmationMessage = 'Open codes will disappear after this action.'
-//		(e || window.event).returnValue = confirmationMessage;
-//		return confirmationMessage;
-//	});
-//};
+window.onload = function() {
+    window.addEventListener("beforeunload", function (e) {
+
+		set_cookie("S_editor",     S_editor);
+		set_cookie("S_simulator",  S_simulator);
+		set_cookie("S_anim_speed", S_anim_speed);
+		set_cookie("S_ins_limit",  S_ins_limit);
+
+		/* TODO save codes and input in cookies */
+		/* TODO check if code is not to large to fit in cookie */
+
+		var confirmationMessage = 'Open codes will disappear after this action.'
+		(e || window.event).returnValue = confirmationMessage;
+		return confirmationMessage;
+	});
+};
