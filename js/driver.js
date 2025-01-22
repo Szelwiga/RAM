@@ -53,10 +53,15 @@ function D_req_cache_prev_page() {
 }
 
 function D_global_init() {
-	/* TODO */
 	S_init();
+
 	EA_init(1);
 	SA_init();
+
+	EA_cook_ie_restore();
+
+	if (get_cookie("D_input"))
+		SA_set_input(get_cookie("D_input"));
 	D_state = "editing";
 }
 

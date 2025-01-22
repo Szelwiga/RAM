@@ -1,6 +1,7 @@
 var EA_localfiles        = {};
 var EA_current_editor    = S_get_editor();
 var EA_current_localfile = 0;
+var EA_cookie_limit      = 3600;
 
 function EA_choose_editor(editor){
 	if (EA_current_editor == editor) return;
@@ -145,4 +146,59 @@ function BTN_editor_delete() {
 	
 }
 
-/* TODO: rearange btn's on small screen css :/ */
+function EA_split_code(code) {
+	var current = "";
+	var res = [];
+
+	for (var i of code) {
+		current += i;
+		if (current.length > EA_cookie_limit) {
+			res.push(current);
+			current = "";
+		}
+	}
+
+	if (current != "") res.push(current);
+	return res;
+}
+
+function EA_part_code(x, y){
+	return "EA_code_frag_" + x + "_" + y;
+}
+function EA_cook_ie_codes() {
+	EA_localfiles[EA_current_localfile] = EA_get_code();
+	var codes_cnt = 0;
+	for (var i in EA_localfiles) {
+		codes_cnt++; 
+
+		var code = EA_split_code(EA_localfiles[i]);
+
+		var frag_cnt = 0;
+		for (var code_frag of code){
+			frag_cnt++;
+			set_cookie(EA_part_code(codes_cnt, frag_cnt), code_frag);
+		}
+		
+	}
+	set_cookie("EA_codes_cnt", codes_cnt);
+}
+
+function EA_cook_ie_restore(){
+	if (get_cookie("EA_codes_cnt") == "")
+		return;
+	var cnt = get_cookie("EA_codes_cnt");
+	for (var i = 1; i <= cnt; i++) {
+
+		if (i!=1) EA_init(i);
+
+		var j = 1, code = "";
+		while (get_cookie(EA_part_code(i, j))) {
+			code += get_cookie(EA_part_code(i, j));
+			set_cookie(EA_part_code(i, j), "");
+			j++;
+		}
+
+		EA_paste_code(code);
+	}
+	EA_choose_localfile(1);
+}

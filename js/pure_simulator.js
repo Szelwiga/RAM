@@ -31,13 +31,11 @@ function PS_set_counters(mem, time, ins) {
 function PS_set_alu(value, error) {
 	if (value == undefined) value = "?";
 	text = "<pre>";
-	if (window.innerWidth >= G_min_width_viewport) {
-		text += "Accumulator   <br>";
-		text += "Value: " + value + "<br>";
-		if (error)
-			text += PS_color("ERROR", "--red");
-		text += "</pre>";
-	} 
+	text += "Accumulator   <br>";
+	text += "Value: " + value + "<br>";
+	if (error)
+		text += PS_color("ERROR", "--red");
+	text += "</pre>";
 	text = text.replaceAll("Accumulator", PS_color("<b>Accumulator</b>", "--light_orange"));
 	document.getElementById("PS-alu").innerHTML = text;
 }
