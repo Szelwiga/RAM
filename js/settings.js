@@ -30,6 +30,7 @@ function S_init() {
 	S_ins_limit  = S_try_cookie("S_ins_limit",  S_ins_limit);
 
 	RAM.instruction_limit = S_ins_limit;
+	D_animation_speed_index = S_anim_speed;
 }
 
 var G_min_width_viewport = 1200;
