@@ -25,6 +25,8 @@ function EA_choose_localfile(x) {
 }
 
 function EA_init(x) {
+	EA_current_editor = S_get_editor();
+
 	if (EA_current_editor == "GE") GE_set_up();
 	else                           PE_set_up();
 
