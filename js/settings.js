@@ -19,7 +19,7 @@ var S_descriptions = {
 }
 
 function S_try_cookie(name, curr_value){
-	if (get_cookie(name) != "") return get_cookie("S_editor");
+	if (get_cookie(name) != "") return get_cookie(name);
 	else                        return curr_value;	
 }
 
