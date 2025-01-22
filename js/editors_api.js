@@ -210,4 +210,5 @@ function EA_cook_ie_restore(){
 		EA_paste_code(EA_code_decompress(code));
 		EA_localfiles[i] = EA_get_code();
 	}
+	EA_choose_localfile(1);
 }
