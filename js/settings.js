@@ -52,6 +52,7 @@ function S_get_animation_speed_index() {
 
 var S_base_html = `
 	<div id="S-frame">
+		<br><br>
 		<hr>
 			<div class="S-title"># Settings / Help #</div>
 		<hr>
