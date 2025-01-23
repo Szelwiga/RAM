@@ -30,7 +30,7 @@ function S_init() {
 	S_simulator  = S_try_cookie("S_simulator",  S_simulator);
 	S_anim_speed = S_try_cookie("S_anim_speed", S_anim_speed);
 	S_ins_limit  = S_try_cookie("S_ins_limit",  S_ins_limit);
-	S_show_help  = S_try_cookie("S_show_help",  S_show_help);
+	S_show_help  = S_try_cookie("S_show_help",  S_show_help) == "YES" ? true : false;
 
 	RAM.instruction_limit = S_ins_limit;
 	D_animation_speed_index = S_anim_speed;
@@ -155,7 +155,7 @@ window.onload = function() {
 		set_cookie("S_simulator",   S_simulator);
 		set_cookie("S_anim_speedd", S_anim_speed);
 		set_cookie("S_ins_limit",   S_ins_limit);
-		set_cookie("S_show_help",   S_show_help);
+		set_cookie("S_show_help",   S_show_help ? "YES" : "NO");
 
 		EA_cook_ie_codes();
 
