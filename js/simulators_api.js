@@ -123,6 +123,8 @@ function SA_process_step_result(event, result) {
 			SA_time_cnt = RAM.time_counter;
 			PS_set_counters(RAM.memory_counter, RAM.time_counter, RAM.instruction_counter);
 		}
+	} else {
+		DS_dummy_event_play(event.event + " " + result.ins);
 	}
 
 }

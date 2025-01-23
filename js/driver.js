@@ -179,24 +179,24 @@ function BTN_code_run_full(){
 		if (result.status == "ok") {
 
 			SA_set_output(RAM.get_output());
-			PS_set_alu(RAM.memory[0], 0);
+			SA_set_alu(RAM.memory[0], 0);
 
 		} else if (result.status == "re") {
 
 			SA_set_output(RAM.get_output() + "\nRuntime error on line: " + (result.details.line + 1) + "\n" + result.details.details);
 			SA_color_output("var(--red)");
-			PS_set_alu(RAM.memory[0], 1);
+			SA_set_alu(RAM.memory[0], 1);
 
 		} else {
 
 			SA_set_output(RAM.get_output() + "\nLimit exceeded: " + result.status);
 			SA_color_output("var(--red)");
-			PS_set_alu(RAM.memory[0], 0);
+			SA_set_alu(RAM.memory[0], 0);
 
 		}
 
-		PS_set_counters(RAM.memory_counter, RAM.time_counter, RAM.instruction_counter);
-		PS_set_memory(RAM.get_page_state());
+		SA_set_counters(RAM.memory_counter, RAM.time_counter, RAM.instruction_counter);
+		SA_set_memory(RAM.get_page_state());
 		N_notify("Executed at maximum speed");
 	} else {
 		D_show_hide_simulator();
@@ -207,7 +207,7 @@ function BTN_code_run_full(){
 var D_refresh_rate = 5;
 var D_counter = 0;
 function D_update(){
-	if (PS_is_launched) {
+//	if (PS_is_launched) {
 		var mod = D_animation_speeds_ps[D_animation_speed_index];
 
 		D_counter += D_refresh_rate;
@@ -236,7 +236,7 @@ function D_update(){
 			if (D_events.length != 0)
 				SA_process_step_result(D_events.shift(), D_current_result);
 		}
-	}
+//	}
 }
 
 setInterval(D_update, D_refresh_rate);

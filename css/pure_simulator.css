@@ -33,15 +33,15 @@
 #PS-frame hr {
 	border:       0.125vh solid var(--gray);
 	width:        96%;
-	margin:       0%;
+	margin:       2%;
 	margin-right: 2%;
 	margin-left:  2%;
 }
 
 #PS-frame textarea {
 	position: relative;
-	margin:  2%;
-	padding: 2%;
+	margin:   2%;
+	padding:  2%;
 
 	scrollbar-width:         thin;
 	scrollbar-color:         var(--dark_purple) var(--gray);

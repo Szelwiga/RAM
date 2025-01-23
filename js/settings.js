@@ -125,7 +125,10 @@ function S_BTN_ins_limit(x){
 	
 }
 function S_BTN_simulator() {
-	N_notify("One should change simulator here");
+	S_simulator = S_simulator == "DS" ? "PS" : "DS";
+	document.getElementById("S-simulator-desc").innerHTML   = S_descriptions[S_simulator];
+	document.getElementById("S-simulator-button").innerHTML = S_simulator;
+	SA_curr_sim = S_simulator;
 }
 
 window.onload = function() {
