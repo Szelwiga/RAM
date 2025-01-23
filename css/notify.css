@@ -1,0 +1,86 @@
+#N-notify-box {
+	position: absolute;
+
+	left:   0vh;
+	bottom: 10vh;
+
+	width:  20vh;
+	height: 80vh;
+
+	overflow: hidden;
+
+	font-size:  2vh;
+	color:      var(--white);
+	background: transparent;
+
+	display:        flex;
+	flex-direction: column;
+	align-items:    bottom;
+
+	transition: 0.5s;
+}
+
+
+@keyframes N_notify_animation{
+	0%{
+		opacity: 0;
+		transform: translate(-100%) rotateX(90deg);
+	}
+	25%{
+		opacity: 1;
+		transform: translate(0%, 0) rotateX(0deg);
+	}
+	75%{
+		opacity: 1;
+		transform: translate(0%, 0) rotateX(0deg);
+	}
+	100%{
+		display: none;
+		opacity: 0;
+		transform: translate(-100%, 0) rotateX(90deg);
+	}
+}
+
+.N-notify, .N-warn, .N-info {
+
+	animation-name:      N_notify_animation;
+	animation-fill-mode: forwards;
+
+	position:  relative;
+	Z-index:   5;
+	margin:    1%;
+
+	font-size:  2vh;
+	color:      var(--white);
+	background: var(--black);
+
+	display:         flex;
+	align-items:     center;
+	justify-content: center;
+
+	padding:         1vh;
+	padding-left:    1vh;
+	padding-right:   1vh;
+}
+
+.N-warn {
+	animation-duration: 5000ms;
+	border: 0.25vh solid var(--light_red);
+	background: var(--dark_red);
+}
+
+.N-notify {
+	animation-duration: 3000ms;
+	border: 0.25vh solid var(--light_green);
+	background: var(--dark_green);
+}
+
+.N-info {
+	animation-duration: 1000ms;
+	border: 0.25vh solid var(--light_blue);
+	background: var(--dark_blue);
+}
+
+.N-space-eater {
+	flex-grow: 1;
+}

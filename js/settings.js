@@ -2,6 +2,7 @@ var S_editor     = "PE";    /* PE | GE */
 var S_simulator  = "PS";    /* PS | DS */
 var S_anim_speed = 4;       /* 0-9 */
 var S_ins_limit  = 1000000; /* num */
+var S_show_help  = true;    /* num */
 
 var S_descriptions = {
 	"PE": `Plain editor is dedicated for more advanced users. It is standard text editor with simple 
@@ -16,6 +17,7 @@ var S_descriptions = {
 	"AS": `Select animation speed for simulator.`,
 	"IL": `Allows to specify instruction limit that is taken into account <b></b> only for maximum speed 
 		runs. It's goal is to save from infinite loops.`,
+	"NS": `Allows to select whether help (blue) notifications should be active.`,
 }
 
 function S_try_cookie(name, curr_value){
@@ -28,6 +30,7 @@ function S_init() {
 	S_simulator  = S_try_cookie("S_simulator",  S_simulator);
 	S_anim_speed = S_try_cookie("S_anim_speed", S_anim_speed);
 	S_ins_limit  = S_try_cookie("S_ins_limit",  S_ins_limit);
+	S_show_help  = S_try_cookie("S_show_help",  S_show_help);
 
 	RAM.instruction_limit = S_ins_limit;
 	D_animation_speed_index = S_anim_speed;
@@ -71,6 +74,11 @@ var S_base_html = `
 			<div class="S-option-title">Instruction limit</div>
 			<input type="text" id="S-ins-limit" oninput="S_BTN_ins_limit(this.value)">
 			<div class="S-description" id="S-ins-limit-desc"></div>
+		<hr>
+		<br>
+			<div class="S-option-title">Show help</div>
+			<button class="S-flip-button" id="S-show-help-button" onclick="S_BTN_show_help()"></button>
+			<div class="S-description" id="S-show-help-desc"></div>
 	</div>
 `;
 
@@ -96,6 +104,9 @@ function S_run_settings() {
 	document.getElementById("S-anim-btn-" + S_anim_speed).style.background = "var(--yellow)";
 
 	document.getElementById("S-ins-limit").value = S_ins_limit;
+
+	document.getElementById("S-show-help-desc").innerHTML   = S_descriptions["NS"];
+	document.getElementById("S-show-help-button").innerHTML = S_show_help ? "YES" : "NO";
 }
 
 function S_BTN_editor() {
@@ -114,8 +125,8 @@ function S_BTN_anim_level(x){
 	D_animation_speed_index = S_anim_speed;
 }
 
-function S_BTN_ins_limit(x){
-	if (!isNaN(x+"")) {
+function S_BTN_ins_limit(x) {
+	if (!isNaN(x + "")) {
 		document.getElementById("S-ins-limit").style.background = "var(--black)";
 		S_ins_limit = parseInt(x);
 		RAM.instruction_limit = S_ins_limit;
@@ -130,14 +141,20 @@ function S_BTN_simulator() {
 	document.getElementById("S-simulator-button").innerHTML = S_simulator;
 	SA_curr_sim = S_simulator;
 }
+function S_BTN_show_help() {
+	S_show_help = !S_show_help;
+	document.getElementById("S-show-help-desc").innerHTML   = S_descriptions["NS"];
+	document.getElementById("S-show-help-button").innerHTML = S_show_help ? "YES" : "NO";
+}
 
 window.onload = function() {
     window.addEventListener("beforeunload", function (e) {
 
-		set_cookie("S_editor",     S_editor);
-		set_cookie("S_simulator",  S_simulator);
-		set_cookie("S_anim_speed", S_anim_speed);
-		set_cookie("S_ins_limit",  S_ins_limit);
+		set_cookie("S_editor",      S_editor);
+		set_cookie("S_simulator",   S_simulator);
+		set_cookie("S_anim_speedd", S_anim_speed);
+		set_cookie("S_ins_limit",   S_ins_limit);
+		set_cookie("S_show_help",   S_show_help);
 
 		EA_cook_ie_codes();
 

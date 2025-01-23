@@ -11,6 +11,7 @@
 		<link href="css/grid_editor.css" rel="stylesheet">
 		<link href="css/pure_simulator.css" rel="stylesheet">
 		<link href="css/detailed_simulator.css" rel="stylesheet">
+		<link href="css/notify.css" rel="stylesheet">
 
 		<script src="js/cookies.js"> </script>
 		<script src="js/settings.js"> </script>
@@ -29,18 +30,18 @@
 		<div class="top-bar" id="top-bar">
 			<div class="top-bar-left">
 
-				<button class="orange-btn" onclick="BTN_code_run()" onmouseover='N_info("Load code to simulator / Run")' onmouseout="N_info_clear()"> <img class="icon" src="svg/run2.svg"/> </button>
-				<button class="orange-btn" onclick="BTN_code_run_step()" onmouseover='N_info("Load code to simulator / Run one step")' onmouseout="N_info_clear()"> <img class="icon" src="svg/runstep.svg"/> </button>
-				<button class="orange-btn" onclick="BTN_code_stop()" onmouseover='N_info("Exit simulator / Stop")' onmouseout="N_info_clear()"> <img class="icon" src="svg/stop2.svg"/> </button>
-				<button class="orange-btn" onclick="BTN_code_run_full()" onmouseover='N_info("Run at maximum speed")' onmouseout="N_info_clear()"> <img class="icon" src="svg/runfull.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_run()" onmouseover='N_info("Load code to simulator / Run")'> <img class="icon" src="svg/run2.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_run_step()" onmouseover='N_info("Load code to simulator / Run one step")'> <img class="icon" src="svg/runstep.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_stop()" onmouseover='N_info("Exit simulator / Stop")'> <img class="icon" src="svg/stop2.svg"/> </button>
+				<button class="orange-btn" onclick="BTN_code_run_full()" onmouseover='N_info("Run at maximum speed")'> <img class="icon" src="svg/runfull.svg"/> </button>
 
 				<div class="sep"></div>
 
-				<button class="blue-btn" onclick="BTN_editor_download()" onmouseover='N_info("Save code on your device")' onmouseout="N_info_clear()"> <img class="icon" src="svg/download2.svg"/> </button>
-				<button class="blue-btn" onclick="BTN_copy()" onmouseover='N_info("Copy code to clipboard")' onmouseout="N_info_clear()"> <img class="icon" src="svg/copy2.svg"/> </button>
-				<button class="blue-btn" onclick="BTN_editor_upload()" onmouseover='N_info("Open code from your device")' onmouseout="N_info_clear()"> <img class="icon" src="svg/upload2.svg"/> </button>
-				<button class="blue-btn" onclick="BTN_editor_new()" onmouseover='N_info("Create new code")' onmouseout="N_info_clear()"> <img class="icon" src="svg/new.svg"/> </button>
-				<button class="blue-btn" onclick="BTN_editor_delete()" onmouseover='N_info("Delete code")' onmouseout="N_info_clear()"> <img class="icon" src="svg/delete1.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_editor_download()" onmouseover='N_info("Save code on your device")'> <img class="icon" src="svg/download2.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_copy()" onmouseover='N_info("Copy code to clipboard")'> <img class="icon" src="svg/copy2.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_editor_upload()" onmouseover='N_info("Open code from your device")'> <img class="icon" src="svg/upload2.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_editor_new()" onmouseover='N_info("Create new code")'> <img class="icon" src="svg/new.svg"/> </button>
+				<button class="blue-btn" onclick="BTN_editor_delete()" onmouseover='N_info("Delete code")'> <img class="icon" src="svg/delete1.svg"/> </button>
 
 				<div class="sep"></div>
 
@@ -50,9 +51,9 @@
 			</div>
 			<div class="top-bar-right">
 
-				<button class="yellow-btn" onclick="BTN_animator()" onmouseover='N_info("Simulator")' onmouseout="N_info_clear()"> <img class="icon" src="svg/robot.svg"/> </button>
-				<button class="yellow-btn" onclick="BTN_levels()" onmouseover='N_info("Levels")' onmouseout="N_info_clear()"> <img class="icon" src="svg/tasks.svg"/> </button>
-				<button class="yellow-btn" onclick="BTN_settings()" onmouseover='N_info("Settings / Help")' onmouseout="N_info_clear()"> <img class="icon" src="svg/settings.svg"/> </button>
+				<button class="yellow-btn" onclick="BTN_animator()" onmouseover='N_info("Simulator")'> <img class="icon" src="svg/robot.svg"/> </button>
+				<button class="yellow-btn" onclick="BTN_levels()" onmouseover='N_info("Levels")'> <img class="icon" src="svg/tasks.svg"/> </button>
+				<button class="yellow-btn" onclick="BTN_settings()" onmouseover='N_info("Settings / Help")'> <img class="icon" src="svg/settings.svg"/> </button>
 
 			</div>
 		</div>
@@ -62,9 +63,7 @@
 			<div class="right" id="right-div"></div>
 		</div>
 
-	<div id="N-notify" hidden></div>
-	<div id="N-info" hidden></div>
-	<div id="N-warn" hidden></div>
+	<div id="N-notify-box"><div class="N-space-eater"></div></div>
 
 	<script>
 		D_global_init();
