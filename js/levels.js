@@ -1,12 +1,19 @@
-var L_is_launched = false;
-var L_current_level = "";
-var L_levels_data = "";
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Backend for levels (including submit)
+*/
+
+var L_is_launched = false; /* check if levels are launched */
+var L_current_level = ""; /* stores currently open level */
+var L_levels_data = ""; /* stores levels data (if accepted or no) */
 
 /* mangage level cookies */
+/* gets code from level */
 function L_get_level_code(level) {
-
 	return level.group + level.level;
 }
+
+/* accepts the level (after solving it) */
 function L_accept(level_code) {
 	var new_levels_data = "";
 	for (var level of L_levels_data.split("#")) {
@@ -23,6 +30,8 @@ function L_accept(level_code) {
 	}
 	L_levels_data = new_levels_data;
 }
+
+/* check if level is solved */
 function L_is_accepted(level_code) {
 	if (L_levels_data == "") return false;
 
@@ -34,6 +43,7 @@ function L_is_accepted(level_code) {
 	}
 	return false;
 }
+/* check if given code level is present in levels_data */
 function L_is_present(level_code) {
 	if (L_levels_data == "") return false;
 
@@ -44,6 +54,8 @@ function L_is_present(level_code) {
 	}
 	return false;
 }
+
+/* inits levels data */
 function L_init_levels_data(){
 	for (var level of LD_levels) {
 		var code = L_get_level_code(level);
@@ -54,6 +66,8 @@ function L_init_levels_data(){
 		}		
 	}
 }
+
+/* creates levels html on page */
 function L_init(){
 	document.getElementById("right-div").innerHTML = `
 		<div id="L-frame">
@@ -90,6 +104,7 @@ function L_init(){
 		</div>
 	`;
 
+	/* and inits are structures */
 	L_init_levels_data();
 	for (var level of LD_levels)
 		if (!L_is_accepted(L_get_level_code(level)) && L_current_level == "")
@@ -100,13 +115,14 @@ function L_init(){
 	L_print_level();
 }
 
+/* removes levels from page */
 function L_close() {
 	document.getElementById("right-div").innerHTML = "";
 	L_is_launched = false;
 }
 
+/* checks if level is locked (all problems from previous group should be solved) */
 function L_locked(code) {
-	return false; /* TODO uncomment me */
 	for (var level of LD_levels) {
 		if (level.group == code[0])
 			return false;
@@ -116,12 +132,16 @@ function L_locked(code) {
 	return false;
 }
 
+/* returns class for level (to color it correctly) */
 function L_get_level_btn_class(code) {
 	if (L_is_accepted(code))     return "L-accepted-level";
 	if (L_locked(code))          return "L-locked-level";
 
 	return "L-unsolved-level";
 }
+
+
+/* redraws level buttons */
 function L_draw_levels_bar() {
 
 	var bar = document.getElementById("L-level-buttons");
@@ -159,6 +179,7 @@ function L_draw_levels_bar() {
 	
 }
 
+/* chooses level */
 function L_choose_level(code) {
 	document.getElementById(L_current_level).style.color = "var(--white)";
 	document.getElementById(code).style.color            = "var(--orange)";	
@@ -166,6 +187,7 @@ function L_choose_level(code) {
 	L_print_level();
 }
 
+/* fills level data (problem statement) on page */
 function L_print_level(){
 	var desc = document.getElementById("L-problem-desc");
 
@@ -228,22 +250,22 @@ function L_print_level(){
 	else                     document.getElementById("L-problem-desc").style.borderColor = "var(--gray)";
 }
 
-
+/* random shuffle implementation (for randomized order of tests) */
 function L_shuffle_array(array) {
     for (let i = array.length - 1; i >= 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
-
+/* sets output / input elements */
 function L_set_output(text){
 	document.getElementById("L-output").value = text;
 }
-
 function L_set_input(text){
 	document.getElementById("L-input").value = text;
 }
 
+/* blink output (for success or fail) */
 async function L_blink_output(color){
 	document.getElementById("L-output").style.borderColor = color;
 	document.getElementById("L-output").style.color = color;
@@ -252,16 +274,21 @@ async function L_blink_output(color){
 	document.getElementById("L-output").style.color = "var(--white)";
 }
 
+/* colors tests on success / failure */
 function L_color_test(num, color){
 	document.getElementById("L-test-" + num).style.background = color;
 }
 
+/* compare the outputs */
 function L_compare(s1, s2) {
 	return s1.trim() == s2.trim();
 }
 
+/* submit code to level */
 var L_submit_lock = false;
 async function L_BTN_submit(){
+	/*  this "mutex" should be enough (people rather dont click twice on button
+		in time that is smaller the one milisecond)*/
 	if (L_submit_lock)
 		return;
 	L_submit_lock = true;
@@ -269,6 +296,7 @@ async function L_BTN_submit(){
 	L_set_input("");
 	L_set_output("");
 
+	/* get level data */
 	var level_code = L_current_level;
 	var level = undefined;
 	for (var c_level of LD_levels)
@@ -276,8 +304,11 @@ async function L_BTN_submit(){
 			level = c_level;
 		
 	var tests = [...level.tests];
-//	L_shuffle_array(tests);
+	/* L_shuffle_array(tests); */
+	/*  TODO full shuffle is not a good idea, lets shuffle
+		only inside (hidden/nohidden group instead)*/
 
+	/* init ram machine engine and compile the code */
 	var code = EA_get_code();
 	var RAM_L = new ram_machine();	
 	RAM_L.instruction_limit = level.instruction_limit;
@@ -285,7 +316,8 @@ async function L_BTN_submit(){
 	RAM_L.memory_limit      = level.memory_limit;
 
 	var result = RAM_L.parse_code(code);
-	
+
+	/* throw compilation error if one occurs */
 	if (result.status != "ok") {
 		N_warn("Compilation error in line: " + (result.line_number + 1) + "\n" + result.description);
 		L_set_output("Error in line: " + (result.line_number + 1) + "\n" + result.description);
@@ -294,15 +326,18 @@ async function L_BTN_submit(){
 		L_submit_lock = false;
 		return;
 	}
+
+	/* perform the tests */	
 	var failed = false;
-
 	for (var test of tests) {
-
+		/* to build the tension :) */
 		await new Promise(r => setTimeout(r, 300));	
 
+		/* set input / clear RAM machine state */
 		RAM_L.clear_state();
 		RAM_L.set_input(test.in.join(" "));
 
+		/* execute code on given test and report the output */
 		result = RAM_L.run_full();
 
 		if (result.status == "ok") {
@@ -350,6 +385,8 @@ async function L_BTN_submit(){
 			}
 		}
 	}
+
+	/* react to grading */
 	if (!failed) {
 
 		N_notify("Level: " + level_code + " completed!");

@@ -1,12 +1,17 @@
-var GE_is_locked    = false;
-var GE_locked_code  = "";
-var GE_last_update  = 0;
-var GE_is_launched  = 0;
-var GE_green_frame_timeout = 2000;
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Backend of grid editor
+*/
 
-var GE_id_ptr        = 1;
-var GE_line_cnt      = 0;
-var GE_cache         = {};
+var GE_is_locked    = false; /* check if code is locked */
+var GE_locked_code  = "";
+var GE_last_update  = 0; /* last update for frame highlight */
+var GE_is_launched  = 0; /* checks if editor is presnet on screen */
+var GE_green_frame_timeout = 2000; /* turn off frame highlight after this amount of milis */
+
+var GE_id_ptr        = 1; /* resposible for generating fresh id-s */
+var GE_line_cnt      = 0; /* code lenght in lines */
+var GE_cache         = {}; /* cache that is necessary for handling some keypress acitions */
 var GE_input_classes = {
 	"GE-comment":     1,
 	"GE-label":       1,
@@ -14,6 +19,7 @@ var GE_input_classes = {
 	"GE-argument":    3,
 };
 
+/* template for a single row in grid editor */
 var GE_row_template = `
 	<div class="GE-linenumber">?</div>
 	<input class="GE-label" type="text" placeholder="label"></input><div class="GE-sep"></div>
@@ -22,8 +28,8 @@ var GE_row_template = `
 	<button class="GE-comment-btn">#</button>
 `;
 
+/* creates GE HTML on webpage */
 function GE_set_up(){
-	/* creates GE HTML on webpage */
 	var elem = document.getElementById("left-div");
 	elem.innerHTML = `
 		<div id="GE-editor-frame">
@@ -53,24 +59,29 @@ function GE_set_up(){
 	PE_is_launched = 0;
 }
 
+/* creates fresh row id */
 function GE_gen_id(s){
 	return s + GE_id_ptr++;
 }
 
+/* gets row_item value */
 function GE_get_elem_value(elem){
 	if (elem.nodeName == "INPUT") return elem.value;
 	else                          return elem.innerHTML;
 }
 
+/* checks if one of input elements is focused */
 function GE_check_focus(){
 	var focused_elem = document.activeElement;
 	return (focused_elem.className in GE_input_classes);
 }
 
+/* code generator for position in grid */
 function GE_position_str(x, y){
 	return "r" + x + "c" + y;
 }
 
+/* returns position (row, column) that has focus */
 function GE_get_focused_pos(){
 	var focused_elem = document.activeElement;
 	var code = document.getElementById("GE-code");
@@ -91,6 +102,7 @@ function GE_get_focused_pos(){
 	return undefined;
 }
 
+/* updates cache */
 function GE_set_cache(){
 
 	GE_cache = {};	
@@ -124,6 +136,7 @@ function GE_set_cache(){
 
 }
 
+/* loads code to GE */
 function GE_paste_code(text){
 	lines = text.split('\n');
 
@@ -170,6 +183,7 @@ function GE_paste_code(text){
 	GE_reformat();
 }
 
+/* creates code from grid editor */
 function GE_get_code(){
 	var result = "";
 	var code = document.getElementById("GE-code");
@@ -208,6 +222,7 @@ function GE_get_code(){
 	}
 }
 
+/* move focus (used when using arrows on editor) */
 function GE_try_set_focus(r, c){
 	var code = document.getElementById("GE-code");
 	for (var row of code.children) {
@@ -232,6 +247,7 @@ function GE_try_set_focus(r, c){
 
 }
 
+/* appends line at given position */
 function GE_append_line(line){
 	var code = document.getElementById("GE-code");
 	var to_next = false;
@@ -259,6 +275,7 @@ function GE_append_line(line){
 	}
 }
 
+/* changes line type from comment to normal and vice versa */
 function GE_flip_line_type(elem_id, ln){
 	var code = document.getElementById("GE-code");
 	if (elem_id == undefined) {
@@ -358,6 +375,7 @@ function GE_flip_line_type(elem_id, ln){
 	GE_reformat();
 }
 
+/* reformats grid editor fixes buttons and input states (necessary after some operations) */
 function GE_reformat(){
 
 	var code = document.getElementById("GE-code");
@@ -447,11 +465,14 @@ function GE_reformat(){
 		}
 	}
 }
+
+/* appends line at the end */
 function GE_append_last_line(){
 	GE_append_line(GE_line_cnt);
 	GE_reformat();
 }
 
+/* remove given line */
 function GE_delete_line(line){
 	if (GE_line_cnt == 1) return;
 
@@ -480,6 +501,7 @@ function GE_delete_line(line){
 	}
 }
 
+/* clears highlighted lines */
 function GE_clear_highlight(){
 	var code = document.getElementById("GE-code");
 	for (var row of code.children) {
@@ -490,6 +512,8 @@ function GE_clear_highlight(){
 		}
 	}
 }
+
+/* highlights lines */
 function GE_highlight_line(x){
 	GE_clear_highlight();
 	var code = document.getElementById("GE-code");
@@ -506,6 +530,7 @@ function GE_highlight_line(x){
 	}
 }
 
+/* locks code editing */
 function GE_lock(){
 	/* locks editor editing */
 	GE_is_locked    = true;
@@ -520,6 +545,7 @@ function GE_lock(){
 					row_item.readOnly = true;
 }
 
+/* unlocks code editing */
 function GE_unlock(){
 	/* unlocks editor editing */
 	GE_is_locked = false;
@@ -533,6 +559,7 @@ function GE_unlock(){
 					row_item.readOnly = false;
 }
 
+/* react to key presses */
 document.addEventListener("keydown", function GE_navigator(event) {	
 	if (!GE_is_launched)	return;
 	if (!GE_check_focus())	return;
@@ -587,6 +614,7 @@ document.addEventListener("keydown", function GE_navigator(event) {
 	GE_set_cache();
 });
 
+/* updates frame colors */
 function GE_update_frame_color(){
 	if (!GE_is_launched)    return;
 	if (GE_is_locked)       return;

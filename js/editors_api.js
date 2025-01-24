@@ -1,8 +1,14 @@
-var EA_localfiles        = {};
-var EA_current_editor    = S_get_editor();
-var EA_current_localfile = 0;
-var EA_cookie_limit      = 3600;
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Wraper for APIs of plain text editor and grid editor; multiple codes management
+*/
 
+var EA_localfiles        = {}; /* stores codes in different tabs */
+var EA_current_editor    = S_get_editor(); /* current editor either PE or GE */
+var EA_current_localfile = 0; /* number of current tab*/
+var EA_cookie_limit      = 3600; /* single cookie limit */
+
+/* swap between editors */
 function EA_choose_editor(editor){
 	if (EA_current_editor == editor) return;
 	if (editor == "GE") {
@@ -17,6 +23,7 @@ function EA_choose_editor(editor){
 	EA_current_editor = editor;
 }
 
+/* opens selected file in curretn editor */
 function EA_choose_localfile(x) {
 	EA_localfiles[EA_current_localfile] = EA_get_code();
 	EA_paste_code(EA_localfiles[x]);
@@ -25,6 +32,7 @@ function EA_choose_localfile(x) {
 	N_notify("Opened file " + x);
 }
 
+/* inits editor (and creates file) */
 function EA_init(x) {
 	EA_current_editor = S_get_editor();
 
@@ -36,36 +44,44 @@ function EA_init(x) {
 	EA_regenerate_buttons();
 }
 
+/* wrappers to editors functions */
+/* pastes code to editor */
 function EA_paste_code(code) {
 	if (EA_current_editor == "GE") GE_paste_code(code);
 	else                           PE_paste_code(code);
 }
 
+/* extracts code from editor */
 function EA_get_code() {
 	if (EA_current_editor == "GE") return GE_get_code();
 	else                           return PE_get_code();
 }
 
+/* locks editor */
 function EA_lock() {
 	if (EA_current_editor == "GE") GE_lock();
 	else                           PE_lock();
 }
 
+/* unlocks editor */
 function EA_unlock() {
 	if (EA_current_editor == "GE") GE_unlock();
 	else                           PE_unlock();
 }
 
+/* highlights line */
 function EA_highlight_line(x){
 	if (EA_current_editor == "GE") GE_highlight_line(x);
 	else                           PE_highlight_line(x);
 }
 
+/* clears highlight */
 function EA_clear_highlight(x){
 	if (EA_current_editor == "GE") GE_clear_highlight(x);
 	else                           PE_clear_highlight(x);
 }
 
+/* redraw code tabs buttons */
 function EA_regenerate_buttons(){
 	var btns = document.getElementById("codes_btns");
 	btns.innerHTML = "";
@@ -84,6 +100,7 @@ function EA_regenerate_buttons(){
 	}
 }
 
+/* download code to local device */
 function BTN_editor_download() {
 	var filename = "ram_code_" + EA_current_localfile + ".txt";
 	var dl_elem = document.createElement("a");
@@ -99,11 +116,13 @@ function BTN_editor_download() {
 	N_notify("Saved");
 }
 
+/* copy code to clipboard */
 function BTN_copy() {
 	navigator.clipboard.writeText(EA_get_code());
 	N_notify("Copied to clipboard");
 }
 
+/* upload to editor from local device */
 function BTN_editor_upload() {
 	document.getElementById("EA_code_uploader").click();
 }
@@ -112,6 +131,7 @@ async function EA_load_file(){
 	N_notify("Opened file");
 }
 
+/* create new local file */
 function BTN_editor_new() {
 	EA_localfiles[EA_current_localfile] = EA_get_code();
 	var i = 1;
@@ -120,6 +140,7 @@ function BTN_editor_new() {
 	N_notify("File " + i + " created");
 }
 
+/* delete localfile tab */
 var BTN_delete_time = 0;
 function BTN_editor_delete() {
 	if (Object.keys(EA_localfiles).length == 1) {
@@ -147,14 +168,16 @@ function BTN_editor_delete() {
 }
 
 /* TODO This should be change to compression */
+/* currently this only escapes cookie sensitive characters */
 function EA_code_compress(code){
 	return code.replaceAll("\n", "/ENTER").replaceAll(";", "/SEMICOLON");
 }
 
 function EA_code_decompress(code){
-	return code.replaceAll("/ENTER", "\n").replaceAll("/SEMICOLON", ";");
-	
+	return code.replaceAll("/ENTER", "\n").replaceAll("/SEMICOLON", ";");	
 }
+
+/* split code so that it fits into multiple cookies */
 function EA_split_code(code) {
 	var current = "";
 	var res = [];
@@ -170,10 +193,12 @@ function EA_split_code(code) {
 	if (current != "") res.push(current);
 	return res;
 }
-
+/* generate id for code fragment in cookie */
 function EA_part_code(x, y){
 	return "EA_code_frag_" + x + "_" + y;
 }
+
+/* store codes in cookies */
 function EA_cook_ie_codes() {
 	EA_localfiles[EA_current_localfile] = EA_get_code();
 	var codes_cnt = 0;
@@ -192,6 +217,7 @@ function EA_cook_ie_codes() {
 	set_cookie("EA_codes_cnt", codes_cnt);
 }
 
+/* restore codes from cookeis */
 function EA_cook_ie_restore(){
 	if (get_cookie("EA_codes_cnt") == "")
 		return;

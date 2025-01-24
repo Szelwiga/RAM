@@ -1,3 +1,8 @@
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Small notification agent
+*/
+
 var N_warning_duration = 5000;
 var N_notify_duration  = 3000;
 var N_info_time        = 2000;

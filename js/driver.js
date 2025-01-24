@@ -1,46 +1,53 @@
 /*
-states:
-	running:
-		editor is locked
-		simulator is opened
-
-	editing:
-		editor is not locked
-		simulator is opened but inactive
-
-	levels:
-		editor is not locked
-		levels are opened
-
-	settings:
-		editor is not locked
-		settings are opened
-	
-running states:
-
-	
-	auto:
-		simulation is running automatically
-
-	noauto:
-		simulation is running not automatically
-
-	stopped:
-		simualtion is ready to be launched / finished
-
+	Author:            Marcel Szelwiga
+	Implemented here:  Driver code of whole project
 */
 
+/*
+	possible D_state:
+		running:
+			editor is locked
+			simulator is opened
+
+		editing:
+			editor is not locked
+			simulator is opened but inactive
+
+		levels:
+			editor is not locked
+			levels are opened
+
+		settings:
+			editor is not locked
+			settings are opened
+
+possible D_running_state (while D_state == running)
+		auto:
+			simulation is running automatically
+
+		noauto:
+			simulation is running not automatically
+
+		stopped:
+			simualtion is ready to be launched / finished
+*/
+
+/* RAM Machine engine used for all simulation purposes */
 var RAM = new ram_machine();
 
+/* representes current running state */
 var D_running_state;
 var D_state;
-var D_events                 = [];
-var D_current_result         = undefined;
-var D_pressed_step           = false;
-var D_animation_speeds_ps    = [5, 10, 25, 50, 100, 250, 500, 1000, 2000, 2500];
-var D_animation_speed_index  = S_get_animation_speed_index();
-var D_animation_speed_levels = 10;
 
+var D_events                 = []; /* events in queue to display  */
+var D_current_result         = undefined; /* result of currently performed instruction (multiple events can occur during that time) */
+var D_pressed_step           = false; /* if next animation should be executed */
+
+var D_animation_speeds_ps    = [5, 10, 25, 50, 100, 250, 500, 1000, 2000, 2500]; /* animation speeds for PS */
+var D_animation_speed_index  = S_get_animation_speed_index(); /* index for above array */
+var D_animation_speed_levels = 10; /* above array length */
+
+/* allows to lookup memory in PS (there is no such option in DS) */
 function D_req_cache_next_page() {
 	var t = BigInt(PS_current_mem[0][0]) + BigInt(RAM.cache_size);
 	PS_set_memory(RAM.get_page_state(t));
@@ -52,23 +59,27 @@ function D_req_cache_prev_page() {
 	PS_set_memory(RAM.get_page_state(t));
 }
 
+/* Init function that is launched on page load */
 function D_global_init() {
-	S_init();
+	S_init(); /* read cookies and init global settings */
 
-	EA_init(1);
-	SA_init();
+	EA_init(1); /* launch editor (and create empty code) */
+	SA_init(); /* init simulator */
 
-	EA_cook_ie_restore();
+	EA_cook_ie_restore(); /* load codes saved in cookies */
 
+	/* restore input from cookies */
 	if (get_cookie("D_input"))
 		SA_set_input(EA_code_decompress(get_cookie("D_input")));
 	D_state = "editing";
 }
 
+/* sleep function implementation */
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+/* tries to enter running mode (checks if code can be parsed correctly) */
 async function D_try_enter_running() {
 	/* load code to machine; compile and optionally change D_state to running */
 	var result = RAM.parse_code(EA_get_code());
@@ -86,6 +97,8 @@ async function D_try_enter_running() {
 		SA_color_output("var(--red)");
 	}
 }
+
+/* prepare RAM engine for code execution */
 function D_init_RAM(){
 	var inp = SA_get_input();
 	if (inp == undefined)
@@ -99,6 +112,7 @@ function D_init_RAM(){
 	SA_color_output("var(--gray)");
 }
 
+/* change states and performs action when clicking "play/run" button */
 function BTN_code_run(){
 	if (D_state == "running") {
 		if (D_running_state == "stopped") {
@@ -124,6 +138,7 @@ function BTN_code_run(){
 	D_try_enter_running();
 }
 
+/* change states and performs action when clicking "stop" button */
 function BTN_code_stop() {
 	if (D_state == "running") {
 		if (D_running_state == "stopped" || D_running_state == "noauto") {
@@ -139,6 +154,7 @@ function BTN_code_stop() {
 	}
 }
 
+/* change states and performs action when clicking "run step" button */
 function BTN_code_run_step() {
 	if (D_state == "running") {
 		if (D_running_state == "stopped") {
@@ -165,10 +181,12 @@ function BTN_code_run_step() {
 	D_try_enter_running();
 }
 
+/* perform full code run (at maximum speed without animations) */
 function BTN_code_run_full(){
 	if (D_state == "running" || D_state == "editing") {
 		D_init_RAM();
 
+		/* compile first */
 		var result = RAM.parse_code(EA_get_code());
 		if (result.status != "ok") {
 			SA_set_output("Error in line: " + (result.line_number + 1) + "\n" + result.description);
@@ -176,8 +194,10 @@ function BTN_code_run_full(){
 			SA_color_output("var(--red)");
 		}
 
+		/* execute code */
 		result = RAM.run_full();
 
+		/* take care of result */
 		if (result.status == "ok") {
 
 			SA_set_output(RAM.get_output());
@@ -208,43 +228,42 @@ function BTN_code_run_full(){
 	}
 }
 
+/* update function that plays events if D_state is running and animations should be performed */
 var D_refresh_rate = 5;
 var D_counter = 0;
 function D_update(){
-//	if (PS_is_launched) {
-		var mod = D_animation_speeds_ps[D_animation_speed_index];
+	var mod = D_animation_speeds_ps[D_animation_speed_index];
 
-		D_counter += D_refresh_rate;
-		D_counter %= mod;
+	D_counter += D_refresh_rate;
+	D_counter %= mod;
 
-		if (D_counter != 0) return;
+	if (D_counter != 0) return;
 
-		if (D_state == "running" && (D_running_state == "auto" || D_running_state == "noauto")) {
-			if (D_events.length == 0) {
-				if (D_current_result != undefined && D_current_result.status != "ok") {
+	if (D_state == "running" && (D_running_state == "auto" || D_running_state == "noauto")) {
+		if (D_events.length == 0) {
+			if (D_current_result != undefined && D_current_result.status != "ok") {
 
-					D_running_state = "stopped";
-					EA_clear_highlight();
+				D_running_state = "stopped";
+				EA_clear_highlight();
 
-					return;
-				} else if (D_pressed_step || D_running_state == "auto") {
-					var result = RAM.run_one_step();
-					D_pressed_step = false;
+				return;
+			} else if (D_pressed_step || D_running_state == "auto") {
+				var result = RAM.run_one_step();
+				D_pressed_step = false;
 
-					EA_highlight_line(result.line+1);
+				EA_highlight_line(result.line+1);
 
-					D_events         = [...result.events];
-					D_current_result = result;
+				D_events         = [...result.events];
+				D_current_result = result;
+	}
 		}
-			}
-			if (D_events.length != 0)
-				SA_process_step_result(D_events.shift(), D_current_result);
-		}
-//	}
+		if (D_events.length != 0)
+			SA_process_step_result(D_events.shift(), D_current_result);
+	}
 }
-
 setInterval(D_update, D_refresh_rate);
 
+/* update D_state when clicking settings / level / simulator button */
 var D_input_cache;
 function D_show_hide_simulator(){
 	if (SA_is_launched()) {

@@ -1,5 +1,6 @@
 /*
-	This code is responsible for interacting with plain editor
+	Author:            Marcel Szelwiga
+	Implemented here:  Backend of plain text editor
 */
 
 /* globals of PE */

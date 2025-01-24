@@ -1,3 +1,8 @@
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  PixelArt RAM machine animator / simulator
+*/
+
 var DS_is_launched = 0;
 var DS_canvas;
 var DS_ctx;

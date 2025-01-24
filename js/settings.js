@@ -1,10 +1,19 @@
-var S_editor     = "PE";    /* PE | GE */
-var S_simulator  = "PS";    /* PS | DS */
-var S_anim_speed = 4;       /* 0-9 */
-var S_ins_limit  = 1000000; /* num */
-var S_show_help  = "YES";   /* YES | NO */
-var S_lang       = "PL";    /* PL | EN */
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Settings backend; and main cookies management
+*/
 
+/* global constant adjustable for internal purposes */
+var G_min_width_viewport = 1200;
+
+var S_editor     = "PE";    /* PE | GE */ /* default editor */
+var S_simulator  = "PS";    /* PS | DS */ /* default simulator */
+var S_anim_speed = 6;       /* 0-9 */ /* default animation speed */
+var S_ins_limit  = 1000000; /* num */ /* default instruction limit */
+var S_show_help  = "YES";   /* YES | NO */ /* should blue help messages be present? */
+var S_lang       = "PL";    /* PL | EN */ /* default language for RAM */
+
+/* detailed descriptions */
 var S_descriptions = {
 	"PE": `Plain editor is dedicated for more advanced users. It is standard text editor with simple 
 		syntax highlight. One can use any standard shortcuts there.`,
@@ -15,18 +24,21 @@ var S_descriptions = {
 		informations in compact format.`,
 	"DS": `Detailed simulator is pixel art based simulator that visually executes all the instructions
 		in fancy way.`,
-	"AS": `Select animation speed for simulator.`,
+	"AS": `Select animation speed for simulator. Note that it also affects speed of one step clicks as
+		one instruction may be composed out of multiple events.`,
 	"IL": `Allows to specify instruction limit that is taken into account <b></b> only for maximum speed 
 		runs. It's goal is to save from infinite loops.`,
 	"NS": `Allows to select whether help (blue) notifications should be active.`,
 	"LN": `Allows to select if problem descriptions should be written in english or in polish.`,
 }
 
+/* helper function for reading cookie value */
 function S_try_cookie(name, curr_value){
 	if (get_cookie(name) != "") return get_cookie(name);
 	else                        return curr_value;	
 }
 
+/* read cookies and set limits */
 function S_init() {
 	S_editor     = S_try_cookie("S_editor",     S_editor);
 	S_simulator  = S_try_cookie("S_simulator",  S_simulator);
@@ -41,20 +53,20 @@ function S_init() {
 	D_animation_speed_index = S_anim_speed;
 }
 
-var G_min_width_viewport = 1200;
 
+/* TODO remove uses of this functions and use variables instead */
+/* function wrappers for settings variables */
 function S_get_editor() {
 	return S_editor;
 }
-
 function S_get_simulator() {
 	return S_simulator;
 }
-
 function S_get_animation_speed_index() {
 	return S_anim_speed;
 }
 
+/* default view for settings */
 var S_base_html = `
 	<div id="S-frame">
 		<br><br>
@@ -95,6 +107,8 @@ var S_base_html = `
 	</div>
 `;
 
+
+/* opens settings window on page */
 function S_run_settings() {
 	document.getElementById("right-div").innerHTML = S_base_html;
 
@@ -125,6 +139,7 @@ function S_run_settings() {
 	document.getElementById("S-lang-button").innerHTML = S_lang;
 }
 
+/* actions triggered on settings changes */
 function S_BTN_editor() {
 	S_editor = S_editor == "GE" ? "PE" : "GE";
 	EA_choose_editor(S_editor);
@@ -170,6 +185,7 @@ function S_BTN_lang() {
 	document.getElementById("S-lang-button").innerHTML = S_lang;
 }
 
+/* save cookies and ask for confirmation on page exit */
 window.onload = function() {
     window.addEventListener("beforeunload", function (e) {
 

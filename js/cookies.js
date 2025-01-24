@@ -1,4 +1,7 @@
-/* https://www.w3schools.com/js/js_cookies.asp */
+/*
+	Author:            https://www.w3schools.com/js/js_cookies.asp
+	Implemented here:  API to document.cookies 
+*/
 
 function set_cookie(cname, cvalue, exdays) {
 	if (!exdays) exdays = 365 * 2;

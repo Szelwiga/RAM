@@ -1,6 +1,11 @@
-var SA_curr_sim = S_get_simulator();
-var SA_time_cnt = 0;
-var SA_output   = "";
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Wrapper for both simulators API
+*/
+
+var SA_curr_sim = S_get_simulator(); /* current simulator */
+var SA_time_cnt = 0; /* internal time counter to split timer for separate events */
+var SA_output   = ""; /* stores the output created during code execution */
 
 function SA_init(){
 	if (SA_curr_sim == "PS") PS_init();
@@ -64,6 +69,7 @@ function SA_color_output(color) {
 	else                     DS_color_output(color);
 }
 
+/* inits new simulation */
 function SA_init_sim(){
 	SA_clear();
 	SA_set_memory(RAM.get_page_state());
@@ -71,6 +77,7 @@ function SA_init_sim(){
 	SA_output   = "";
 }
 
+/* play animation (this is a bridge between driver and PS/DS api) */
 function SA_process_step_result(event, result) {
 	if (SA_curr_sim == "PS") {
 		SA_time_cnt += RAM_DEFAULT_EVENTS_TIMES[event.event];

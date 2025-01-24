@@ -1,10 +1,17 @@
-var PS_is_launched = 0;
-var PS_current_mem;
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Backend for pure simulator
+*/
 
+var PS_is_launched = 0; /* checks if simulator is present on screen */
+var PS_current_mem; /* remembers memory state */
+
+/* color text fragment */
 function PS_color(text, color) {
 	 return "<span style=\"color:var(" + color + ");display:inline;\">" + text + "</span>";
 }
 
+/* set counters time / memory / instruction */
 function PS_set_counters(mem, time, ins) {
 	var text = "<pre>";
 	if (window.innerWidth >= G_min_width_viewport) {
@@ -28,6 +35,7 @@ function PS_set_counters(mem, time, ins) {
 	document.getElementById("PS-counters").innerHTML = text;
 }
 
+/* sets accumulator value (and optionaly reports error) */
 function PS_set_alu(value, error) {
 	if (value == undefined) value = "?";
 	text = "<pre>";
@@ -40,6 +48,7 @@ function PS_set_alu(value, error) {
 	document.getElementById("PS-alu").innerHTML = text;
 }
 
+/* sets instruction and event frame */
 function PS_set_instruction(instruction, event) {
 
 	var style = [
@@ -76,10 +85,12 @@ function PS_set_instruction(instruction, event) {
 	document.getElementById("PS-instruction").innerHTML = text;
 }
 
+/* sets output */
 function PS_set_output(text) {
 	document.getElementById("PS-output").value = text;
 }
 
+/* sets memory */
 function PS_set_memory(mem) {
 	var cell_box = document.getElementById("PS-memory-cells-box");
 	PS_current_mem = [...mem];
@@ -99,6 +110,7 @@ function PS_set_memory(mem) {
 	}
 }
 
+/* highlights memeory cell (when simulation touches it) */
 async function PS_highlight_cell(x, color) {
 	var E = document.getElementById("PS-memory-cell-" + x);
 
@@ -107,6 +119,7 @@ async function PS_highlight_cell(x, color) {
 	E.style.background = "var(--black)";
 }
 
+/* resets state of PS */
 function PS_clear() {
 	PS_set_counters(0, 0, 0);
 	PS_set_alu(0, "");
@@ -132,14 +145,15 @@ function PS_clear() {
 	PS_current_mem = mem;
 }
 
+/* gets / sets input */
 function PS_get_input() {
 	return document.getElementById("PS-input").value;
 }
-
 function PS_set_input(inp) {
 	return document.getElementById("PS-input").value = inp;
 }
 
+/* crates PS html on page */
 function PS_init(){
 	var elem = document.getElementById("right-div");
 	elem.innerHTML = `
@@ -167,10 +181,11 @@ function PS_init(){
 	PS_clear();
 }
 
+
+/* colors frame / output */
 function PS_set_frame_color(color) {
 	document.getElementById("PS-frame").style.borderColor = color;
 }
-
 function PS_color_output(color) {
 	document.getElementById("PS-output").style.borderColor = color;
 	document.getElementById("PS-output").style.color       = color;
