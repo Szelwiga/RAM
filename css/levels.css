@@ -1,0 +1,332 @@
+
+#L-frame{
+	position: relative;
+	margin:   1.25vh;
+	top:      0;
+	left:     0;
+	border:   solid 0.25vh var(--blue);
+
+	width:  96%;
+	height: 96%;
+	max-height: 96%;
+
+	display:         flex;
+	flex-direction:  column;
+
+	overflow: hidden;
+
+	word-spacing: normal;
+	word-break:   normal;
+	word-wrap:    normal;
+
+	-moz-tab-size: 4;
+	-o-tab-size:   4;
+	tab-size:      4;
+}
+
+.L-T1-wrap {
+	height: 100%;
+	max-height: 60%;
+
+	flex-grow: 1;
+
+	display:        flex;
+	flex-direction: row;
+}
+
+.L-T2-wrap {
+	height:     40%;
+	min-height: 20%;
+	width:      100%;
+
+	flex-shrink: 0;
+	display:         flex;
+	flex-direction:  row;
+	justify-content: center;
+	align-items:     center;
+}
+
+.L-T3-wrap {
+	height:    100%;
+	min-width: 40%;
+
+	display:        flex;
+	flex-direction: column;
+}
+
+.L-T5-wrap {
+	height:    100%;
+	flex-grow: 1;
+
+	display:        flex;
+	flex-direction: column;
+
+	margin: 1.5%;
+}
+
+.L-T4-wrap {
+	width: 100%;
+
+	flex-grow: 1;
+	max-width: 100%;
+
+	display:        flex;
+	flex-direction: row;
+}
+
+@media screen and (min-width:1200px) {
+	.L-T1-wrap {
+		height: 100%;
+		max-height: 80%;
+	}
+	.L-T2-wrap {
+		min-height: 20%;
+		height: 20%;
+	}
+}
+
+.L-submit-btn {
+	margin: 2%;
+	height: 30pt;
+	width:  96%;
+
+	font-size:   20pt;
+	font-family: monospace;
+	line-height: 22pt;
+
+	border:      0.225vh solid var(--yellow);
+	background:  var(--black);
+	color:       var(--white);
+
+	transition-duration: 0.5s;
+}
+
+.L-submit-btn:hover {
+	background:   var(--dark_green);
+	border-color: var(--dark_green);
+}
+
+
+#L-level-buttons {
+	width: 45pt;
+
+	display:        flex;
+	flex-direction: column;
+	align-items:    top;
+
+	height:     100%;
+	max-height: 100%;
+
+	scrollbar-width: none;
+	overflow:        auto;
+
+	flex-shrink: 0;
+}
+
+#L-problem-desc {
+	display:         flex;
+	flex-direction:  column;
+	align-items:     center;
+
+	margin: 1% 1% 1% 0%;
+	
+	flex-grow: 1;
+	border:    solid 2px var(--gray);
+
+	scrollbar-width: thin;
+	scrollbar-color: var(--dark_purple) var(--gray);
+
+	overflow: auto;
+}
+
+.L-T2-wrap textarea {
+	position: relative;
+	margin:   1%;
+	margin-bottom: 3%;
+	padding:  2%;
+
+	scrollbar-width: thin;
+	scrollbar-color: var(--dark_purple) var(--gray);
+
+    height:    calc(100% - 1vh);
+    flex-grow: 1;
+	width:     96%;
+
+	resize:      none;
+	border:      0.25vh solid var(--gray);
+	background:  var(--black);
+	color:       var(--white);
+	caret-color: var(--white);
+
+	font-size:   15pt;
+	font-family: monospace;
+	line-height: 16pt;
+
+	transition:     border-color 0.2s ease-in-out;
+}
+
+.L-level-group {
+	margin:  15pt 3pt;
+	width:   calc(100% - 6pt);
+
+	display:         flex;
+	flex-direction:  column;
+	justify-content: center;
+	align-items:     center;
+}
+
+.L-level-group button {
+	margin: 3pt 0pt;
+	width:  30pt;
+	height: 30pt;
+
+	font-size:   16pt;
+	font-family: monospace;
+
+	background: var(--black);
+	transition: 0.5s;
+
+	color: var(--white);
+}	
+
+.L-accepted-level {
+	border: 0.25vh solid var(--green);
+}
+.L-locked-level {
+	border: 0.25vh solid var(--dark_red);
+}
+.L-unsolved-level {
+	border: 0.25vh solid var(--dark_yellow);
+}
+
+.L-level-group button:hover {
+	background: var(--dark_orange);
+}
+
+#L-open-tests {
+	margin: 2%;
+	flex-grow: 1;
+
+	display:               grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-template-rows:    repeat(2, 1fr);
+
+	border: 0.25vh solid var(--green);
+}
+
+#L-hidden-tests {
+	margin: 2%;
+	flex-grow: 1;
+
+	display:               grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-template-rows:    repeat(2, 1fr);
+
+	border: 0.25vh solid var(--red);
+}
+
+.L-test-box {
+	display:         flex;
+	justify-content: center;
+	align-items:     center;
+	background:      var(--black);
+	text-align:      center;
+}
+
+.L-test-icon {
+	display:         flex;
+	justify-content: center;
+	align-items:     center;
+	background:      var(--black);
+	text-align:      center;
+
+	width:  25pt;
+	height: 25pt;
+
+	background: var(--dark_gray);
+	color:      var(--white);
+	border:     none;
+
+	font-size:   16pt;
+	font-family: monospace;
+
+	transition: 0.5s;
+}
+
+.L-test-icon:hover {
+	background: var(--dark_purple);
+}
+
+#L-problem-img {
+	width:  340px;
+	height: 340px;
+	margin: 10px;
+}
+
+#L-problem-desc hr {
+	border: 0.125vh solid var(--blue);
+	width:  50%;
+	margin: 1%;
+}
+
+#L-title {
+	font-size:   30pt;
+	font-family: monospace;
+	line-height: 33pt;
+	color:       var(--white);
+}
+
+.L-long-text {
+	margin:      1%;
+	font-size:   15pt;
+	line-height: 18pt;
+	color:       var(--white);
+	width:       65%;
+
+	display: inline;
+}
+
+.L-long-text pre{
+	display: inline;
+
+	color:            var(--gray);
+	background-color: var(--dark_black);
+
+	margin:        0;
+	padding:       2px 8px;
+	border-radius: 5px;
+}
+	
+.L-inout {
+	margin: 1%;
+	height: 26pt;
+	width:  96%;
+
+	font-size:   16pt;
+	font-family: monospace;
+
+	background:  var(--black);
+	color:       var(--white);
+
+	display:         flex;
+	align-items:     center;
+	justify-content: center;
+
+	transition-duration: 0.5s;
+}
+
+.L-limits {
+	margin: 1%;
+	width:  96%;
+	font-size:   15pt;
+	line-height: 18pt;
+
+	display:         flex;
+	align-items:     right;
+	justify-content: right;
+	
+}
+.L-right {
+	display:         flex;
+	justify-content: flex-end;
+}

@@ -113,6 +113,7 @@ function BTN_code_run(){
 		}
 		return;
 	} else if (D_state == "levels") {
+		L_close();
 		D_show_hide_simulator();
 		D_state = "editing";
 	} else if (D_state == "settings") {
@@ -153,6 +154,7 @@ function BTN_code_run_step() {
 		}
 		return;
 	} else if (D_state == "levels") {
+		L_close();
 		D_show_hide_simulator();
 		D_state = "editing";
 	} else if (D_state == "settings") {
@@ -199,6 +201,8 @@ function BTN_code_run_full(){
 		SA_set_memory(RAM.get_page_state());
 		N_notify("Executed at maximum speed");
 	} else {
+		if (D_state == "levels")
+			L_close();
 		D_show_hide_simulator();
 		D_state = "editing";
 	}
@@ -253,7 +257,11 @@ function D_show_hide_simulator(){
 }
 
 function BTN_animator(){
-	if (D_state == "levels" || D_state == "settings") {
+	if (D_state == "levels") {
+		D_state = "editing";
+		L_close();
+		D_show_hide_simulator();
+	} else if (D_state == "settings") {
 		D_state = "editing";
 		D_show_hide_simulator();
 	}
@@ -268,6 +276,8 @@ function BTN_settings(){
 	} else if (D_state == "editing") {
 		D_show_hide_simulator();
 		D_state = "settings";
+	} else if (D_state == "levels") {
+		L_close();
 	}
 	D_state = "settings";
 	S_run_settings();
@@ -283,5 +293,5 @@ function BTN_levels(){
 		D_show_hide_simulator();
 	}
 	D_state = "levels";
-	N_notify("TODO Run levels\n");
+	L_init();
 }

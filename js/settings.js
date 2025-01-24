@@ -2,7 +2,8 @@ var S_editor     = "PE";    /* PE | GE */
 var S_simulator  = "PS";    /* PS | DS */
 var S_anim_speed = 4;       /* 0-9 */
 var S_ins_limit  = 1000000; /* num */
-var S_show_help  = true;    /* num */
+var S_show_help  = "YES";   /* YES | NO */
+var S_lang       = "PL";    /* PL | EN */
 
 var S_descriptions = {
 	"PE": `Plain editor is dedicated for more advanced users. It is standard text editor with simple 
@@ -18,6 +19,7 @@ var S_descriptions = {
 	"IL": `Allows to specify instruction limit that is taken into account <b></b> only for maximum speed 
 		runs. It's goal is to save from infinite loops.`,
 	"NS": `Allows to select whether help (blue) notifications should be active.`,
+	"LN": `Allows to select if problem descriptions should be written in english or in polish.`,
 }
 
 function S_try_cookie(name, curr_value){
@@ -31,6 +33,9 @@ function S_init() {
 	S_anim_speed = S_try_cookie("S_anim_speed", S_anim_speed);
 	S_ins_limit  = S_try_cookie("S_ins_limit",  S_ins_limit);
 	S_show_help  = S_try_cookie("S_show_help",  S_show_help) == "YES" ? true : false;
+	S_lang       = S_try_cookie("S_lang",       S_lang);
+
+	L_levels_data = S_try_cookie("L_data", "");
 
 	RAM.instruction_limit = S_ins_limit;
 	D_animation_speed_index = S_anim_speed;
@@ -80,6 +85,13 @@ var S_base_html = `
 			<div class="S-option-title">Show help</div>
 			<button class="S-flip-button" id="S-show-help-button" onclick="S_BTN_show_help()"></button>
 			<div class="S-description" id="S-show-help-desc"></div>
+		<hr>
+		<br>
+			<div class="S-option-title">Language</div>
+			<button class="S-flip-button" id="S-lang-button" onclick="S_BTN_lang()"></button>
+			<div class="S-description" id="S-lang-desc"></div>
+		<br>
+		<br>
 	</div>
 `;
 
@@ -108,6 +120,9 @@ function S_run_settings() {
 
 	document.getElementById("S-show-help-desc").innerHTML   = S_descriptions["NS"];
 	document.getElementById("S-show-help-button").innerHTML = S_show_help ? "YES" : "NO";
+
+	document.getElementById("S-lang-desc").innerHTML   = S_descriptions["LN"];
+	document.getElementById("S-lang-button").innerHTML = S_lang;
 }
 
 function S_BTN_editor() {
@@ -142,10 +157,17 @@ function S_BTN_simulator() {
 	document.getElementById("S-simulator-button").innerHTML = S_simulator;
 	SA_curr_sim = S_simulator;
 }
+
 function S_BTN_show_help() {
 	S_show_help = !S_show_help;
 	document.getElementById("S-show-help-desc").innerHTML   = S_descriptions["NS"];
 	document.getElementById("S-show-help-button").innerHTML = S_show_help ? "YES" : "NO";
+}
+
+function S_BTN_lang() {
+	S_lang = S_lang == "PL" ? "EN" : "PL";
+	document.getElementById("S-lang-desc").innerHTML   = S_descriptions["LN"];
+	document.getElementById("S-lang-button").innerHTML = S_lang;
 }
 
 window.onload = function() {
@@ -156,8 +178,11 @@ window.onload = function() {
 		set_cookie("S_anim_speedd", S_anim_speed);
 		set_cookie("S_ins_limit",   S_ins_limit);
 		set_cookie("S_show_help",   S_show_help ? "YES" : "NO");
+		set_cookie("S_lang",        S_lang);
 
 		EA_cook_ie_codes();
+
+		set_cookie("L_data", L_levels_data);
 
 		if (D_state == "settings" || D_state == "levels") {
 			set_cookie("D_input", EA_code_compress(D_input_cache));

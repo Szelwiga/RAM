@@ -201,7 +201,7 @@ class ram_machine {
 		events.push({event: "get_value", from: cell});
 		var value = this.get_value(cell);
 		if (value == undefined) {
-			events.push({event: "runtime_error", details: "read undefined value", line: curr_line})
+			events.push({event: "runtime_error", details: "read undefined value"})
 			return {result: undefined, events: events};
 		} else {
 			return {result: value, events: events};
@@ -361,7 +361,7 @@ class ram_machine {
 
 	run_full(extra_time_limit){
 		do {
-			var status = RAM.run_one_step();
+			var status = this.run_one_step();
 			if (this.time_counter > this.time_limit)
 				return {status: "timeout"};
 
@@ -371,7 +371,7 @@ class ram_machine {
 			if (this.instruction_counter > this.instruction_limit)
 				return {status: "insout"};
 
-			if (this.memory_counter > this.memory_counter)
+			if (this.memory_counter > this.memory_limit)
 				return {status: "memout"};
 
 			if (status.status == "re")

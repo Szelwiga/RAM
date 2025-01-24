@@ -4,10 +4,10 @@
 	left:   0vh;
 	bottom: 10vh;
 
-	width:  20vh;
+	width:  1vh;
 	height: 80vh;
 
-	overflow: hidden;
+	overflow: visible;
 
 	font-size:  2vh;
 	color:      var(--white);
@@ -18,6 +18,8 @@
 	align-items:    bottom;
 
 	transition: 0.5s;
+
+	z-index: 3;
 }
 
 
@@ -47,8 +49,10 @@
 	animation-fill-mode: forwards;
 
 	position:  relative;
-	Z-index:   5;
+	z-index:   3;
 	margin:    1%;
+
+	width: 20vh;
 
 	font-size:  2vh;
 	color:      var(--white);
@@ -61,6 +65,7 @@
 	padding:         1vh;
 	padding-left:    1vh;
 	padding-right:   1vh;
+	overflow: visible;
 }
 
 .N-warn {
@@ -76,11 +81,12 @@
 }
 
 .N-info {
-	animation-duration: 1000ms;
+	animation-duration: 2000ms;
 	border: 0.25vh solid var(--light_blue);
 	background: var(--dark_blue);
 }
 
 .N-space-eater {
+	z-index:  3;
 	flex-grow: 1;
 }

@@ -2,7 +2,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta="viewport" content="width=device=width, initial-scale=1.0">
-		<title>TODO</title>
+		<title># RAM Engine IDE #</title>
 
 		<link href="css/settings.css" rel="stylesheet">
 		<link href="css/normalize.css" rel="stylesheet">
@@ -12,6 +12,7 @@
 		<link href="css/pure_simulator.css" rel="stylesheet">
 		<link href="css/detailed_simulator.css" rel="stylesheet">
 		<link href="css/notify.css" rel="stylesheet">
+		<link href="css/levels.css" rel="stylesheet">
 
 		<script src="js/cookies.js"> </script>
 		<script src="js/settings.js"> </script>
@@ -23,7 +24,11 @@
 		<script src="js/pure_simulator.js"> </script>
 		<script src="js/detailed_simulator.js"> </script>
 		<script src="js/simulators_api.js"> </script>
+		<script src="js/levels.js"> </script>
 		<script src="js/driver.js"> </script>
+
+		<script src="data/levels_data.js"> </script>
+
 	</head>
 	<body>
 		<input type="file" id="EA_code_uploader" hidden onchange="EA_load_file()">
@@ -58,12 +63,11 @@
 			</div>
 		</div>
 
+		<div id="N-notify-box"><div class="N-space-eater"></div></div>
 		<div class="wrapper">
 			<div class="left" id="left-div"></div>
 			<div class="right" id="right-div"></div>
 		</div>
-
-	<div id="N-notify-box"><div class="N-space-eater"></div></div>
 
 	<script>
 		D_global_init();
