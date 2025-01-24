@@ -33,23 +33,27 @@
 #PS-frame hr {
 	border:       0.125vh solid var(--gray);
 	width:        96%;
-	margin:       2%;
+	margin:       5px;
 	margin-right: 2%;
 	margin-left:  2%;
 }
 
 #PS-frame textarea {
 	position: relative;
-	margin:   2%;
-	padding:  2%;
+	margin:   10px;
+	padding:  10px;
+
+	margin-right: 2%;
+	margin-left:  2%;
+
 
 	scrollbar-width:         thin;
 	scrollbar-color:         var(--dark_purple) var(--gray);
-	scrollbar-margin-bottom: 10px;
 
-    height:    auto;
-    flex-grow: 1;
-	width:     96%;
+    height:     auto;
+    flex-grow:  1;
+	width:      96%;
+	min-height: 15%;
 
 	resize:      none;
 	border:      0.125vh solid var(--gray);
@@ -59,11 +63,14 @@
 }
 
 #PS-memory {
-	margin:  2%;
-	padding: 2%;
+	margin:  10px;
+	padding: 10px;
+
+	margin-right: 2%;
+	margin-left:  2%;
 
 	height: 23%;
-	width:  92%;
+	width:  calc(96% - 20px);
 
 	border:     0.125vh solid var(--gray);
 	background: var(--black);
@@ -99,11 +106,17 @@
 }
 
 .PS-triple {
-	margin:  2%;
-	padding: 0%;
+	margin:  10px;
+	padding: 0px;
+
+	margin-right: 2%;
+	margin-left:  2%;
 
 	height: 23%;
 	width:  96%;
+
+	min-height:  15%;
+	flex-shrink: 1;
 
 	display:         flex;
 	flex-direction:  row;
@@ -118,8 +131,8 @@
 
 	flex-grow:     1;
 	margin:        2%;
-	margin-top:    0%;
-	margin-bottom: 0%;
+	margin-top:    0px;
+	margin-bottom: 0px;
 	height:        100%;
 
 	display:         flex;
@@ -127,8 +140,11 @@
 	align-items:     center;
 }
 
-#PS-frame pre {
-	padding:     2%;
+.PS-triple pre {
+	padding:        2%;
+	padding-top:    10px;
+	padding-bottom: 10px;
+
 	font-family: monospace;
 	font-size:   1.5vw;
 	line-height: 1.7vw;
@@ -158,15 +174,33 @@
 	position:  relative;
 	flex-grow: 1;
 	min-width: 10%;
+	min-height: 20%;
 
 	flex: 1 1 0px;
 
 	display:         flex;
 	justify-content: center;
 	align-items:     center;
+
 	margin: 2%;
+	margin-top:    10px;
+	margin-bottom: 10px;
 
 	border: 0.125vh solid var(--gray);
 
 	transition-duration: 0.200s;
+}
+
+.PS-memory-cells-box pre {
+
+	flex-grow:   1;
+	padding:     2%;
+	font-family: monospace;
+	font-size:   1.5vw;
+	line-height: 1.7vw;
+	color:       var(--white);
+	caret-color: var(--white);
+
+	padding-top:    10px;
+	padding-bottom: 10px;
 }
