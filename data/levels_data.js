@@ -1,3 +1,7 @@
+/*
+	Author:            Marcel Szelwiga
+	Implemented here:  Settings backend; and main cookies management
+*/
 var LD_levels = [
 	{
 		/* group / level */
@@ -112,14 +116,14 @@ var LD_levels = [
 		ale o coś bardziej intuicyjnego - dodawanie liczb! Rameide wie, że to zadanie nie sprawi mu większych trudności, 
 		bo wystarczy dodać dwie liczby: <pre>A</pre> i <pre>B</pre>. Na wejściu robot otrzymuje dwie liczby, 
 		a na wyjściu wystarczy obliczyć ich sumę <pre>A + B</pre>. Rameide nie może się doczekać, 
-		aby wykorzystać swoją wiedzę o instrukcjach <pre>read</pre> i <pre>write</pre>, by rozwiązać to zadanie i pokazać, 
+		aby wykorzystać swoją wiedzę o instrukcji <pre>add</pre>, by rozwiązać to zadanie i pokazać, 
 		że dodawanie to dla niego bułka z masłem!`,
 
 		desc_en: `Robot Rameide is facing another challenge. This time it's not about sorting or reversing numbers, 
 		but something more intuitive – adding numbers! Rameide knows that this task won't be too difficult, 
 		because all he needs to do is add two numbers: <pre>A</pre> and <pre>B</pre>. He receives two numbers as input, 
 		and all he has to do is calculate their sum <pre>A + B</pre>. Rameide can't wait to use his knowledge of the 
-		<pre>read</pre> and <pre>write</pre> instructions to solve this task and show that adding numbers is a piece of cake!`,
+		<pre>add</pre> instruction to solve this task and show that adding numbers is a piece of cake!`,
 
 		/* tests */
 		tests: [
@@ -145,8 +149,8 @@ var LD_levels = [
 		image:    "4-factory.png",
 
 		/* task title */
-		title_pl: "Wypisz wejście",
-		title_en: "Output the input",
+		title_pl: "Odejmowanie stałej",
+		title_en: "Substract the constant",
 
 		/* limits */
 		memory_limit:      10,
@@ -157,13 +161,13 @@ var LD_levels = [
 		desc_pl: `Robot Rameide został postawiony przed wyzwaniem, które wydaje się łatwe, ale wymaga trochę myślenia. 
 		Tym razem jego zadaniem jest wypisać liczbę, którą otrzyma na wejściu, ale z pewną modyfikacją – pomniejszoną o 16! 
 		Na początku dostaje liczbę <pre>X</pre>, ale zamiast po prostu ją wypisać, musi ją najpierw zmniejszyć o 16. 
-		Rameide zastanawia się, jak wykonać tę operację, ale przypomina sobie, że z pomocą instrukcji <pre>read</pre> i <pre>write</pre> 
+		Rameide zastanawia się, jak wykonać tę operację, ale przypomina sobie, że z pomocą instrukcji <pre>sub</pre> i argumentem <pre>=16</pre>
 		z łatwością poradzi sobie z tym zadaniem, licząc <pre>X - 16</pre> i wypisując wynik.`,
 
 		desc_en: `Robot Rameide has been given a challenge that seems simple, but requires a bit of thinking. 
 		This time, his task is to print the number he receives as input, but with a modification – reduced by 16! 
 		At first, he gets a number <pre>X</pre>, but instead of just printing it, he needs to subtract 16 from it first. 
-		Rameide is wondering how to perform this operation, but he remembers that with the help of the <pre>read</pre> and <pre>write</pre> instructions, 
+		Rameide is wondering how to perform this operation, but he remembers that with the help of the <pre>sub</pre> instruction and <pre>=16</pre> argument, 
 		he will easily manage to solve this task, calculating <pre>X - 16</pre> and printing the result.`,
 
 
@@ -202,13 +206,13 @@ var LD_levels = [
 		/* task description */
 		desc_pl: `Robot Rameide stoi teraz przed nowym wyzwaniem. Ma przed sobą trzy liczby: <pre>A</pre>, <pre>B</pre> i <pre>C</pre>, 
 		ale tym razem nie wystarczy ich po prostu wypisać. Musi obliczyć wynik wyrażenia <pre>A - B + C</pre>! 
-		Rameide trochę się zastanawia, ale przypomina sobie, że z pomocą odpowiednich instrukcji <pre>read</pre> i <pre>write</pre> 
+		Rameide trochę się zastanawia, ale przypomina sobie, że z pomocą odpowiednich instrukcji <pre>add</pre> i <pre>sub</pre> 
 		z łatwością poradzi sobie z takim zadaniem. Wystarczy tylko dobrze odczytać liczby, wykonać odpowiednie obliczenia 
 		i wyświetlić wynik! Czas na rozwiązanie tego wyzwania!`,
 
 		desc_en: `Robot Rameide is now facing a new challenge. He has three numbers in front of him: <pre>A</pre>, <pre>B</pre>, and <pre>C</pre>, 
 		but this time, it's not enough to just print them. He needs to calculate the result of the expression <pre>A - B + C</pre>! 
-		Rameide pauses for a moment, but then remembers that with the help of the <pre>read</pre> and <pre>write</pre> instructions, 
+		Rameide pauses for a moment, but then remembers that with the help of the <pre>add</pre> and <pre>sub</pre> instructions, 
 		he can easily handle this task. All he needs to do is correctly read the numbers, perform the calculations, 
 		and print the result! Time to solve this challenge!`,
 
@@ -247,13 +251,13 @@ var LD_levels = [
 		desc_pl: `Robot Rameide zmaga się z kolejnym wyzwaniem. Tym razem stoi przed trudnym wyrażeniem, w którym musi obliczyć 
 		wartość wyrażenia <pre>A / (B * B)</pre>. Rameide ma przed sobą dwie liczby: <pre>A</pre> i <pre>B</pre>, ale nie jest pewien, 
 		jak je ze sobą połączyć, żeby uzyskać wynik. W końcu przypomina sobie, że wystarczy pomnożyć <pre>B</pre> przez siebie, 
-		a potem podzielić <pre>A</pre> przez wynik. Z pomocą odpowiednich instrukcji <pre>read</pre> i <pre>write</pre>, 
+		a potem podzielić <pre>A</pre> przez wynik. Z pomocą odpowiednich instrukcji <pre>div</pre>, 
 		Rameide oblicza wartość wyrażenia i wypisuje wynik.`,
 
 		desc_en: `Robot Rameide is facing another challenge. This time, he needs to calculate the value of the expression <pre>A / (B * B)</pre>. 
 		Rameide has two numbers in front of him: <pre>A</pre> and <pre>B</pre>, but he's not quite sure how to combine them to get the result. 
 		Then he remembers that he just needs to multiply <pre>B</pre> by itself and then divide <pre>A</pre> by that result. 
-		With the help of the <pre>read</pre> and <pre>write</pre> instructions, Rameide calculates the value of the expression and prints the result.`,
+		With the help of multiple <pre>div</pre> instructions, Rameide calculates the value of the expression and prints the result.`,
 
 		/* tests */
 		tests: [
@@ -292,14 +296,14 @@ var LD_levels = [
 		a jego zadaniem jest obliczenie wartości wyrażenia <pre>A * (B * B) - (3 * A)</pre>. Rameide zaczyna zastanawiać się, jak rozwiązać 
 		to zadanie. Zastanawia się, czy najpierw pomnożyć <pre>B</pre> przez siebie, a potem pomnożyć przez <pre>A</pre>, czy może 
 		spróbować inaczej. W końcu przypomina sobie, że najpierw musiałby obliczyć <pre>B * B</pre>, potem pomnożyć przez <pre>A</pre>, 
-		a na koniec odjąć od tego <pre>3 * A</pre>. Dzięki odpowiednim instrukcjom <pre>read</pre> i <pre>write</pre> Rameide skutecznie 
+		a na koniec odjąć od tego <pre>3 * A</pre>. Dzięki odpowiednim instrukcjom <pre>sub</pre> i <pre>mult</pre> Rameide skutecznie 
 		rozwiązuje problem i wypisuje wynik.`,
 
 		desc_en: `Robot Rameide has been asked to solve a mathematical expression. He has two numbers in front of him: <pre>A</pre> and <pre>B</pre>, 
 		and his task is to calculate the value of the expression <pre>A * (B * B) - (3 * A)</pre>. Rameide starts to think about how to solve 
 		this task. He wonders if he should multiply <pre>B</pre> by itself first, and then multiply by <pre>A</pre>, or try a different approach. 
 		Eventually, he remembers that he should first calculate <pre>B * B</pre>, then multiply by <pre>A</pre>, and finally subtract <pre>3 * A</pre> from it. 
-		With the help of the <pre>read</pre> and <pre>write</pre> instructions, Rameide successfully solves the problem and prints the result.`,
+		With the help of the <pre>sub</pre> and <pre>mult</pre> instructions, Rameide successfully solves the problem and prints the result.`,
 
 		/* tests */
 		tests: [
@@ -338,15 +342,14 @@ var LD_levels = [
 		Zadanie polega na obliczeniu wartości wyrażenia <pre>4 * (A * A) + (B * B) - 4 * (A * B)</pre>. 
 		Robot zastanawia się, jak najlepiej rozwiązać to wyrażenie. 
 		Najpierw postanawia obliczyć <pre>A * A</pre>, potem pomnożyć wynik przez 4, następnie wykonać to samo dla <pre>B * B</pre>, 
-		a na końcu obliczyć <pre>4 * (A * B)</pre> i dodać do siebie odpowiednie wyniki. Z pomocą instrukcji <pre>read</pre> i <pre>write</pre>, 
-		Rameide skutecznie oblicza wartość wyrażenia i wypisuje wynik.`,
+		a na końcu obliczyć <pre>4 * (A * B)</pre> i dodać do siebie odpowiednie wyniki. Ale może Ty potrafisz zrobić to lepiej!`,
 
 		desc_en: `Robot Rameide faces another challenge. This time, he has two numbers in front of him: <pre>A</pre> and <pre>B</pre>. 
 		His task is to calculate the value of the expression <pre>4 * (A * A) + (B * B) - 4 * (A * B)</pre>. 
 		Rameide thinks about the best approach to solve the expression. 
 		First, he decides to calculate <pre>A * A</pre>, then multiply the result by 4, and do the same for <pre>B * B</pre>. 
-		Finally, he calculates <pre>4 * (A * B)</pre> and adds the appropriate results. With the help of the <pre>read</pre> and <pre>write</pre> instructions, 
-		Rameide successfully calculates the value of the expression and prints the result.`,
+		Finally, he calculates <pre>4 * (A * B)</pre> and adds the appropriate results. With the help of operation instructions, 
+		But maybe you can do it better!`,
 
 
 		/* tests */
@@ -472,13 +475,13 @@ var LD_levels = [
 		Ma on w sumie <pre>A</pre> cukierków i chce podzielić je na paczki po <pre>B</pre> sztuk. 
 		Po podzieleniu, kilka cukierków może zostać. Pomóż robotowi i oblicz, ile cukierków zostanie mu po podzieleniu.
 		Na wejściu znajdują się dwie liczby <pre>A</pre> (liczba cukierków) i <pre>B</pre> (wielkość jednej paczki);
-		na wyjściu powinna znaleźć się liczba, która mówi, ile cukierków zostanie robotowi po podzieleniu.`,
+		na wyjściu powinna znaleźć się liczba, która mówi, ile cukierków zostanie robotowi po podzieleniu. Być może przydadzą się operacjie <pre>load</pre> i <pre>store</pre>`,
 
 		desc_en: `Robot Rameide loves candies! One day, the robot decided to divide his collection of candies into several equal packets.
 		He has a total of <pre>A</pre> candies and wants to divide them into packets with <pre>B</pre> candies each.
 		After dividing, some candies might remain. Help the robot and calculate how many candies will remain after dividing.
 		Two numbers <pre>A</pre> (the total number of candies) and <pre>B</pre> (the size of one packet) are given as input;
-		the output should be the number of remaining candies after the division.`,
+		the output should be the number of remaining candies after the division. Probably instructions <pre>load</pre> and <pre>store</pre> will be usefull.`,
 
 		/* tests */
 		tests: [
