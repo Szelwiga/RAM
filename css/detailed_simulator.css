@@ -1,6 +1,6 @@
 #DS-frame{
 	position: relative;
-	margin:   1.25vh;
+	margin:   10px;
 	top:      0;
 	left:     0;
 	border:   solid 0.25vh;
@@ -34,7 +34,7 @@
 #DS-frame hr {
 	border:       0.125vh solid var(--gray);
 	width:        96%;
-	margin-top:   4%;
+	margin:       10px;
 	margin-right: 2%;
 	margin-left:  2%;
 }
@@ -43,7 +43,7 @@
 	margin:   0%;
 	position: relative;
 
-	width: 100%;
+	width:  100%;
 	height: 15%;
 	
 	display:         flex;
@@ -52,16 +52,12 @@
 	justify-content: center;
 }
 
-.DS-inout-wrap textarea {
+.DS-inout-wrap textarea, .DS-inout-wrap pre {
 	position: relative;
-	margin:  2%;
-	padding: 2%;
+	margin:  10px;
+	padding: 10px;
 
-	scrollbar-width:         thin;
-	scrollbar-color:         var(--dark_purple) var(--gray);
-	scrollbar-margin-bottom: 10px;
-
-    height:    96%;
+    height:    calc(100% - 20px);
     flex-grow: 1;
 	flex:      1 1 0px;
 
@@ -70,10 +66,29 @@
 	background:  var(--black);
 	color:       var(--white);
 	caret-color: var(--white);
+
+	scrollbar-width: thin;
+	scrollbar-color: var(--dark_purple) var(--gray);
 }
 
+.DS-inout-wrap pre {
+	font-size:   16pt;
+	line-height: 17pt;
+    height:      calc(100% - 42px);
+
+	display:         flex;
+	flex-direction:  column;
+	algin-items:     center;
+	justify-content: center;
+
+	overflow:        auto;
+	scrollbar-width: none;
+}
+#DS-counters span {
+	display: inline;
+}
 #DS-canvas {
-	margin:    2%;
+	margin:    10px;
     flex-grow: 1;
     padding:   0px;
 	border:    0.125vh solid var(--gray);

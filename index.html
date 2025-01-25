@@ -15,6 +15,7 @@
 		<link href="css/notify.css" rel="stylesheet">
 		<link href="css/levels.css" rel="stylesheet">
 
+		<script src="js/noise.js"> </script>
 		<script src="js/cookies.js"> </script>
 		<script src="js/settings.js"> </script>
 		<script src="js/notify.js"> </script>
@@ -27,8 +28,10 @@
 		<script src="js/simulators_api.js"> </script>
 		<script src="js/levels.js"> </script>
 		<script src="js/driver.js"> </script>
+		<script src="js/load_assets.js"> </script>
 
 		<script src="data/levels_data.js"> </script>
+
 
 	</head>
 	<body>
@@ -70,8 +73,12 @@
 			<div class="right" id="right-div"></div>
 		</div>
 
+		<div id="A-assets-div" hidden></div>
+
+
 	<script>
 		D_global_init();
+		A_load_all_assets();
 	</script>
 	</body>
 </html>

@@ -7,7 +7,7 @@
 var G_min_width_viewport = 1200;
 
 var S_editor     = "PE";    /* PE | GE */ /* default editor */
-var S_simulator  = "PS";    /* PS | DS */ /* default simulator */
+var S_simulator  = "DS";    /* PS | DS */ /* default simulator */
 var S_anim_speed = 6;       /* 0-9 */ /* default animation speed */
 var S_ins_limit  = 1000000; /* num */ /* default instruction limit */
 var S_show_help  = "YES";   /* YES | NO */ /* should blue help messages be present? */

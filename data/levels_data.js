@@ -387,12 +387,12 @@ var LD_levels = [
 		/* task description */
 		desc_pl: `Robot Rameide podziwiał ostatnio dynamicznie zmieniającą się liczbę.
 		Niestety cyferki liczby migotały na tyle szybko, że robot często nie był w stanie rozpoznać 
-		żadnej z nich. W tym zadaniu musisz napisać dla Ramei program, który wczyta liczbę całkowitą 
+		żadnej z nich. W tym zadaniu musisz napisać dla Ramei program, który wczyta liczbę naturalną 
 		<pre>N</pre> i wyznaczy jej cyfrę jedności.`,
 		desc_en: `The robot Rameide has recently been admiring a dynamically changing number.
 		Unfortunately, the digits of the number were flickering so quickly that the robot often
 		couldn't recognize any of them. In this task, you need to write a program for Rameide
-		that will read an integer <pre>N</pre> and determine its units digit.`,
+		that will read an positive integer <pre>N</pre> and determine its units digit.`,
 
 		/* tests */
 		tests: [
