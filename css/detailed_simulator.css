@@ -93,3 +93,7 @@
     padding:   0px;
 	border:    0.125vh solid var(--gray);
 }
+@font-face {
+	font-family: 'PixelFont';
+	src: url('/assets/font.otf') format('opentype');
+}
