@@ -7,6 +7,8 @@ var DS_is_launched = 0;
 var DS_canvas;
 var DS_ctx;
 
+var FPS = 60;
+
 var DS_W; /* canvas width */
 var DS_H; /* canvas height */
 var DS_P; /* Pixel Size in Pixels :) */
@@ -17,6 +19,40 @@ var DS_GH; /* height in tiles */
 var DS_board;
 var DS_board_objects;
 
+/* robot */
+var DS_robot = { x: 2, y: 2, state: 0, w: 16, h: 18};
+var DS_robot_states = [
+	/* idle */
+	[0,  0],
+	[16, 0],
+	[32, 0],
+	[48, 0],
+
+	/* move down */
+	[0,  18],
+	[16, 18],
+	[32, 18],
+	[48, 18],
+
+	/* move right */
+	[0,  36],
+	[16, 36],
+	[32, 36],
+	[48, 36],
+
+	/* move left */
+	[0,  54],
+	[16, 54],
+	[32, 54],
+	[48, 54],
+
+	/* move up */
+	[0,  72],
+	[16, 72],
+	[32, 72],
+	[48, 72],
+];
+
 function RA(x, y) {
 	return Math.floor(Math.random() * (y - x + 1)) + x;
 }
@@ -26,7 +62,6 @@ var DS_versions = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 function DS_tile_position(x, y) {
 	return {"x": x * DS_T * DS_P, "y": DS_T * DS_P * y};
 }
-
 
 async function DS_init(){
 	document.getElementById("right-div").innerHTML = `
@@ -92,10 +127,129 @@ function DS_redraw(){
 				var img = A_assets["OUT_1"];
 				DS_ctx.drawImage(img, pos.x, pos.y, SZ * 2, SZ * 2);				
 			}
+//			if (DS_board_objects[x][y].type == "floor") {
+//				DS_ctx.fillRect(pos.x, pos.y, SZ, SZ);
+//			}
+		}
+	}
+
+	/* draw rameide */
+	var img = A_assets["rameide"];
+	var pos = DS_tile_position(DS_robot.x, DS_robot.y);
+	var RSW = DS_robot_states[DS_robot.state][0];
+	var RSH = DS_robot_states[DS_robot.state][1];
+	DS_ctx.drawImage(img, RSW, RSH, DS_robot.w, DS_robot.h, pos.x, pos.y - 2 * DS_P, SZ, SZ + 2 * DS_P);
+//	DS_robot.state++;
+//	DS_robot.state %= 20;
+}
+
+setInterval(DS_redraw, 1000 / FPS);
+
+function DS_bfs(sx, sy, dx, dy) {
+	var dist = [];
+	for (let x = 0; x < DS_GW; x++) {
+		let sub_arr = [];
+		for (let y = 0; y < DS_GH; y++)
+			sub_arr.push(DS_GW * DS_GH);
+		dist.push(sub_arr);
+	}
+	
+	let moves = [
+		{x:  1, y:  0, s: "l"},
+		{x:  0, y:  1, s: "u"},
+		{x: -1, y:  0, s: "r"},
+		{x:  0, y: -1, s: "d"},
+	];
+
+	let Q = [{x: sx, y: sy, d: 0}];
+	while (Q.length != 0) {
+		let C = Q.shift();
+
+		if (dist[C.x][C.y] <= C.d)
+			continue;
+
+		dist[C.x][C.y] = C.d;
+		for (let move of moves) {
+			let nx = C.x + move.x;
+			let ny = C.y + move.y;
+
+			if (!(0 <= nx && nx < DS_GW && 0 <= ny && ny < DS_GH))
+				continue;
+
+			if (DS_board_objects[nx][ny].type == "floor")
+				Q.push({x: nx + 0, y: ny + 0, d: C.d + 1});
+		}
+	}
+	console.log(dist);
+	if (dist[dx][dy] == DS_GW * DS_GH) {
+		N_warn("Internal error: there is no path from robot to its target!");
+		return undefined;
+	}
+
+	let res = [];
+	while (dist[dx][dy] != 0) {
+		console.log(dx, dy);
+		for (let move of moves) {
+			let nx = dx + move.x;
+			let ny = dy + move.y;
+		
+			if (!(0 <= nx && nx < DS_GW && 0 <= ny && ny < DS_GH))
+				continue;
+
+			if (dist[nx][ny] + 1 == dist[dx][dy]) {
+				dx = nx; dy = ny;
+				res.push(move.s);
+				break;
+			}
+		}
+	}
+	return res.reverse();
+}
+
+async function DS_robot_go(x, y, time) {
+	var shortest_path = DS_bfs(DS_robot.x, DS_robot.y, x, y);
+
+	var T = (time / shortest_path.length) / 4;
+	for (let dir of shortest_path) {
+		let cx = DS_robot.x;
+		let cy = DS_robot.y;
+		let S, nx, ny;
+		if (dir == "r") {
+			S = 8, nx = cx + 1; ny = cy;
+		} else if (dir == "l") {
+			S = 12, nx = cx - 1; ny = cy;
+		} else if (dir == "d") {
+			S = 4, nx = cx; ny = cy + 1;
+		} else if (dir == "u") {
+			S = 16, nx = cx; ny = cy - 1;
+		}
+
+		for (var i = S; i < S + 4; i++) {
+			DS_robot.state = i;
+			DS_robot.x = nx * ((i-S) / 3.0) + cx * ((3.0 - (i-S)) / 3.0);
+			DS_robot.y = ny * ((i-S) / 3.0) + cy * ((3.0 - (i-S)) / 3.0);
+			await new Promise(r => setTimeout(r, T));
 		}
 	}
 }
-setInterval(DS_redraw, 100);
+async function DS_robot_idle(time) {
+	var T = 200;
+	while (T) {
+		if (DS_robot.state > 4) {
+			DS_robot.state = 0;
+		} else {
+			DS_robot.state++;
+			DS_robot.state %= 4;
+		}
+		if (time > T) {
+			time -= T;
+			await new Promise(r => setTimeout(r, T));
+		} else {
+			await new Promise(r => setTimeout(r, time));
+			break;
+		}
+	}
+}
 
 function DS_get_with_prefix(name) {
 	var res = [];
@@ -223,21 +377,22 @@ async function DS_gen_board() {
 	DS_board_objects[x+1][ y ].type = "busy";
 	DS_board_objects[ x ][y+1].type = "busy";
 	DS_board_objects[x+1][y+1].type = "busy";
-	if (DS_GW >= 14)
+	if (DS_GW >= 14) {
 		DS_board_objects[x+2][y+1].target = "input";
-	else
+	} else {
 		DS_board_objects[x+1][y+2].target = "input";
-
+	}
 	x = DS_GW - 4; y = 0;
 	pos = DS_tile_position(x, y);
 	DS_board_objects[x][y].type = "output";
 	DS_board_objects[x+1][ y ].type = "busy";
 	DS_board_objects[ x ][y+1].type = "busy";
 	DS_board_objects[x+1][y+1].type = "busy";
-	if (DS_GW >= 14)
+	if (DS_GW >= 14) {
 		DS_board_objects[x-1][y+1].target = "output";
-	else
+	} else {
 		DS_board_objects[x][y+2].target   = "output";
+	}
 
 	/* draw ins unit */
 	x = Math.floor((DS_GW+1)/2) - 2; y = 0;
@@ -257,14 +412,13 @@ async function DS_gen_board() {
 	DS_board_objects[x][y+4].target = "alu";
 
 	/* draw ins unit */
-	
 	x = 1; y = Math.floor(DS_GH/2);
 	pos = DS_tile_position(x, y);
 	for (var i = 0; i < 2; i++)
 		for (var j = 0; j < 2; j++)
 			DS_board_objects[x+i][y+j].type = "busy";
 	DS_ctx.drawImage(A_assets["MEM_C"], pos.x, pos.y, 2 * SZ, 2 * SZ);
-	DS_board_objects[x+3][y].target = "alu";
+	DS_board_objects[x+1][y-1].target = "cache";
 
 	var blob = await new Promise((resolve) => { DS_canvas.toBlob(resolve); });
 	var bitmap = await createImageBitmap(blob);

@@ -77,6 +77,9 @@ async function A_load_all_assets(){
 
 	/* cache R */
 	A_load_asset("MEM_C");
+
+	/* cache R */
+	A_load_asset("rameide");
 	
 
 	while (true) {
