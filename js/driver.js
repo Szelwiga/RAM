@@ -43,8 +43,8 @@ var D_events                 = []; /* events in queue to display  */
 var D_current_result         = undefined; /* result of currently performed instruction (multiple events can occur during that time) */
 var D_pressed_step           = false; /* if next animation should be executed */
 
-var D_animation_speeds_ps    = [5, 10, 25, 50, 100, 250, 500, 1000, 2000, 2500]; /* animation speeds for PS */
-var D_animation_speeds_ds    = [100, 250, 500, 1000, 1000, 1000, 1000, 1000, 1000, 1000]; /* animation speeds for DS */
+var D_animation_speeds_ps    = [5,  10,  25,  50,  100, 250, 500,  1000, 2000, 2500]; /* animation speeds for PS */
+var D_animation_speeds_ds    = [50, 100, 175, 250, 500, 750, 1000, 1500, 2000, 3000]; /* animation speeds for DS */
 var D_animation_speed_index  = S_get_animation_speed_index(); /* index for above array */
 var D_animation_speed_levels = 10; /* above array length */
 
@@ -264,6 +264,9 @@ function D_update() {
 		}
 		if (D_events.length != 0)
 			SA_process_step_result(D_events.shift(), D_current_result, mod);
+	} else {
+		if (SA_curr_sim == "DS")
+			DS_robot_idle(mod * 0.95);
 	}
 }
 setInterval(D_update, D_refresh_rate);

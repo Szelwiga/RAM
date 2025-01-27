@@ -108,7 +108,7 @@ function DS_find_target(t) {
 }
 
 function DS_draw_text(x, y, w, h, text, color) {
-	text = text.trim();
+	text = (text + "").trim();
 
 	let text_width;
 	let low = 1, high = h;

@@ -353,11 +353,11 @@ class ram_machine {
 				this.ip = this.next_line[this.ip];
 			}
 			this.update_time_counter(events);
-			return {status: "ok", events: events, ins: line, line: curr_line};
+			return {status: "ok", events: events, ins: "halt", line: curr_line};
 			
 		} else if (instruction == "halt"){
 			var events = [{event: "halt"}];
-			return {status: "done", events: events, ins: line, line: curr_line};
+			return {status: "done", events: events, ins: "halt", line: curr_line};
 		}
 		
 	}
