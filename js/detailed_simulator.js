@@ -477,7 +477,7 @@ async function DS_gen_board() {
 
 	DS_board_objects[x][y].type = "alu";
 	DS_ctx.drawImage(A_assets["ALU"], pos.x, pos.y, 4 * SZ, 4 * SZ);
-	DS_board_objects[x][y+4].target = "alu";
+	DS_board_objects[x-1][y+3].target = "alu";
 
 	/* draw mem_C unit */
 	x = 1; y = Math.floor(DS_GH/2);
