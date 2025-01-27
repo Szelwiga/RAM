@@ -25,6 +25,10 @@ function EA_choose_editor(editor){
 
 /* opens selected file in curretn editor */
 function EA_choose_localfile(x) {
+	if (EA_is_locked()) {
+		N_warn("Unlock the code by pressing stop first!");
+		return;
+	}
 	EA_localfiles[EA_current_localfile] = EA_get_code();
 	EA_paste_code(EA_localfiles[x]);
 	EA_current_localfile = x;
@@ -52,6 +56,7 @@ function EA_paste_code(code) {
 }
 
 /* extracts code from editor */
+var EA_locked = false;
 function EA_get_code() {
 	if (EA_current_editor == "GE") return GE_get_code();
 	else                           return PE_get_code();
@@ -59,12 +64,18 @@ function EA_get_code() {
 
 /* locks editor */
 function EA_lock() {
+	EA_locked = true;
 	if (EA_current_editor == "GE") GE_lock();
 	else                           PE_lock();
+}
+/* check if is locked */
+function EA_is_locked(){
+	return EA_locked;
 }
 
 /* unlocks editor */
 function EA_unlock() {
+	EA_locked = false;
 	if (EA_current_editor == "GE") GE_unlock();
 	else                           PE_unlock();
 }
@@ -124,6 +135,10 @@ function BTN_copy() {
 
 /* upload to editor from local device */
 function BTN_editor_upload() {
+	if (EA_is_locked()) {
+		N_warn("Unlock the code by pressing stop first!");
+		return;
+	}
 	document.getElementById("EA_code_uploader").click();
 }
 async function EA_load_file(){
@@ -133,6 +148,10 @@ async function EA_load_file(){
 
 /* create new local file */
 function BTN_editor_new() {
+	if (EA_is_locked()) {
+		N_warn("Unlock the code by pressing stop first!");
+		return;
+	}
 	EA_localfiles[EA_current_localfile] = EA_get_code();
 	var i = 1;
 	while (i in EA_localfiles) i++;
@@ -143,6 +162,10 @@ function BTN_editor_new() {
 /* delete localfile tab */
 var BTN_delete_time = 0;
 function BTN_editor_delete() {
+	if (EA_is_locked()) {
+		N_warn("Unlock the code by pressing stop first!");
+		return;
+	}
 	if (Object.keys(EA_localfiles).length == 1) {
 		N_warn("Cannot delete last file");
 		return;
@@ -224,7 +247,7 @@ function EA_cook_ie_restore(){
 	var cnt = get_cookie("EA_codes_cnt");
 	for (var i = 1; i <= cnt; i++) {
 
-		if (i!=1) EA_init(i);
+		if (i != 1) EA_init(i);
 
 		var j = 1, code = "";
 		while (get_cookie(EA_part_code(i, j))) {

@@ -258,9 +258,19 @@ function DS_bfs(sx, sy, dx, dy) {
 	return res.reverse();
 }
 
+var DS_robot_go_lock = false;
 async function DS_robot_go(x, y, time) {
+	/* this mutex is not perfect but launching times of these are delayed in 10ms at least */
+	if (DS_robot_go_lock)
+		return;
+	DS_robot_go_lock = true;
+
 	if (DS_robot.x < 0 || DS_robot.x >= DS_GW) DS_robot.x = 1;
 	if (DS_robot.y < 0 || DS_robot.y >= DS_GH) DS_robot.x = 1;
+
+	DS_robot.x = Math.round(DS_robot.x); /* this is not likely to happend */
+	DS_robot.y = Math.round(DS_robot.y);
+
 	if (DS_board_objects[DS_robot.x][DS_robot.y].type != "floor") {
 		DS_robot.x = 1;
 		DS_robot.y = 1;
@@ -270,6 +280,7 @@ async function DS_robot_go(x, y, time) {
 
 	if (shortest_path.length == 0) {
 		await DS_robot_idle(time);
+		DS_robot_go_lock = false;
 		return;
 	}
 
@@ -295,6 +306,7 @@ async function DS_robot_go(x, y, time) {
 			await new Promise(r => setTimeout(r, T));
 		}
 	}
+	DS_robot_go_lock = false;
 }
 async function DS_robot_idle(time) {
 	var T = 200;
@@ -510,13 +522,15 @@ function DS_color_output(color) {
 }
 
 function DS_set_counters(mem, time, ins) {
+	var counters = document.getElementById("DS-counters");
+	if (!counters) return;
 	var text = "";
 	if (window.innerWidth <= G_min_width_viewport){
-		document.getElementById("DS-counters").style.fontSize   = "10pt";
-		document.getElementById("DS-counters").style.lineHeight = "11pt";
+		counters.style.fontSize   = "10pt";
+		counters.style.lineHeight = "11pt";
 	} else {
-		document.getElementById("DS-counters").style.fontSize   = "16pt";
-		document.getElementById("DS-counters").style.lineHeight = "17pt";
+		counters.style.fontSize   = "16pt";
+		counters.style.lineHeight = "17pt";
 	}
 
 	var text = "";
@@ -527,23 +541,34 @@ function DS_set_counters(mem, time, ins) {
 	text += "Memory:       " + mem;
 	text += "</pre>";
 	text = text.replaceAll("Counters", PS_color("Counters", "--light_purple"));
-	document.getElementById("DS-counters").innerHTML = text;
+	counters.innerHTML = text;
 }
 
 function DS_set_alu(value, state, error) {
-	N_notify("Not implemented!");
+	DS_alu = value;
+	if (error)
+		DS_alu += " - ERROR";
 }
 function DS_set_instruction(instruction, event) {
-	N_notify("Not implemented!");
-}
-function DS_set_memory(mem) {
-	N_notify("Not implemented!");
+	DS_ins = instruction;
 }
 function DS_clear() {
-	N_notify("Not implemented!");
+	DS_ins = "Rameide";
+	DS_alu = "?";
+	DS_ins_color = DS_inactive_color;
+	DS_alu_color = DS_inactive_color;
+
+	DS_memory = [];
+	for (var i = 1; i <= RAM_DEFAULT_CACHE_SIZE; i++)
+		DS_memory.push([i, undefined, DS_inactive_color]);
+
+	DS_reading_input = false;
+	DS_writing_output = false;
+	DS_set_output("");
+
+	DS_robot.text = "";
 }
 function DS_set_frame_color(color) {
-	N_notify("Not implemented!");
 	document.getElementById("DS-frame").style.borderColor = color;
 }
 

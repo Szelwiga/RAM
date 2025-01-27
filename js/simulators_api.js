@@ -45,7 +45,7 @@ function SA_set_output(text) {
 }
 function SA_set_memory(mem) {
 	if (SA_curr_sim == "PS") PS_set_memory(mem);
-	else                     DS_set_memory(mem);
+	else                     DS_update_memory(mem);
 }
 function SA_clear() {
 	if (SA_curr_sim == "PS") PS_clear();
@@ -128,7 +128,7 @@ async function SA_process_step_result(event, result, time) {
 
 	} else {
 		DS_ins = result.ins;
-		time *= 0.95;
+		time *= 0.9;
 		if (event.event == "read") {
 			var pos;
 			var T1 = time * 0.3; /* go to input */
