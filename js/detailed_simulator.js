@@ -7,7 +7,7 @@ var DS_is_launched = 0;
 var DS_canvas;
 var DS_ctx;
 
-var FPS = 10;
+var FPS = 30;
 
 var DS_W; /* canvas width */
 var DS_H; /* canvas height */
@@ -19,14 +19,19 @@ var DS_GH; /* height in tiles */
 var DS_board;
 var DS_board_objects;
 
+var DS_inactive_color = "#FF2244";
+var DS_active_color   = "#22FF44";
+
 var DS_ins = "";
 var DS_alu = "";
-var DS_ins_color = "#FF2200";
-var DS_alu_color = "#FF2200";
+var DS_ins_color = DS_inactive_color;
+var DS_alu_color = DS_inactive_color;
 var DS_memory = [];
+var DS_reading_input = false;
+var DS_writing_output = false;
 
 /* robot */
-var DS_robot = { x: 2, y: 2, state: 0, w: 16, h: 18, text: ""};
+var DS_robot = { x: 2, y: 2, state: 0, w: 16, h: 18, text: "", text_color: "#FABD2F"};
 var DS_robot_states = [
 	/* idle */
 	[0,  0],
@@ -91,7 +96,15 @@ async function DS_init(){
 	DS_window_resize();
 	DS_memory = [];
 	for (var i = 1; i <= RAM_DEFAULT_CACHE_SIZE; i++)
-		DS_memory.push([i, undefined, "#FFFFFF"]);
+		DS_memory.push([i, undefined, "#FF2244"]);
+}
+
+function DS_find_target(t) {
+	for (var x = 0; x < DS_GW; x++)
+		for (var y = 0; y < DS_GH; y++)
+			if (DS_board_objects[x][y].target == t)
+				return { x: x, y: y };
+	return undefined;
 }
 
 function DS_draw_text(x, y, w, h, text, color) {
@@ -143,11 +156,11 @@ function DS_redraw() {
 		for (var y = 0; y < DS_GH; y++) {
 			var pos = DS_tile_position(x, y);
 			if (DS_board_objects[x][y].type == "input") {
-				var img = A_assets["IN_1"];
+				var img = A_assets[DS_reading_input ? "IN_2" : "IN_1"];
 				DS_ctx.drawImage(img, pos.x, pos.y, SZ * 2, SZ * 2);
 			}
 			if (DS_board_objects[x][y].type == "output") {
-				var img = A_assets["OUT_1"];
+				var img = A_assets[DS_writing_output ? "OUT_2" : "OUT_1"];
 				DS_ctx.drawImage(img, pos.x, pos.y, SZ * 2, SZ * 2);
 			}
 			if (DS_board_objects[x][y].type == "memory") {
@@ -155,10 +168,10 @@ function DS_redraw() {
 				DS_ctx.drawImage(img, pos.x, pos.y, SZ, SZ * 2);
 				var text1 = DS_memory[cnt][0];
 				var text2 = DS_memory[cnt][1];
-				if (text1 == undefined || text1 == "") text1 = "?";
-				if (text2 == undefined || text2 == "") text2 = "?";
-				DS_draw_text(pos.x + DS_P, pos.y + DS_P * 19, 14 * DS_P, 8 * DS_P, text1 + "", DS_memory[cnt][3]);
-				DS_draw_text(pos.x + DS_P, pos.y + DS_P * 30, 14 * DS_P, 8 * DS_P, text2 + "", DS_memory[cnt][3]);
+				if (text1 == undefined) text1 = "?";
+				if (text2 == undefined) text2 = "?";
+				DS_draw_text(pos.x + DS_P, pos.y + DS_P * 19, 14 * DS_P, 8 * DS_P, text1 + "", DS_memory[cnt][2]);
+				DS_draw_text(pos.x + DS_P, pos.y + DS_P * 30, 14 * DS_P, 8 * DS_P, text2 + "", DS_memory[cnt][2]);
 				cnt++;
 			}
 			if (DS_board_objects[x][y].type == "alu") {
@@ -178,7 +191,9 @@ function DS_redraw() {
 	var pos = DS_tile_position(DS_robot.x, DS_robot.y);
 	var RSW = DS_robot_states[DS_robot.state][0];
 	var RSH = DS_robot_states[DS_robot.state][1];
+
 	DS_ctx.drawImage(img, RSW, RSH, DS_robot.w, DS_robot.h, pos.x, pos.y - 2 * DS_P, SZ, SZ + 2 * DS_P);
+	DS_draw_text(pos.x - DS_P * 4, pos.y - DS_P * 1, DS_P * 24, DS_P * 8, DS_robot.text, DS_robot.text_color);
 }
 
 setInterval(DS_redraw, 1000 / FPS);
@@ -226,7 +241,6 @@ function DS_bfs(sx, sy, dx, dy) {
 
 	let res = [];
 	while (dist[dx][dy] != 0) {
-		console.log(dx, dy);
 		for (let move of moves) {
 			let nx = dx + move.x;
 			let ny = dy + move.y;
@@ -253,6 +267,11 @@ async function DS_robot_go(x, y, time) {
 	}
 
 	var shortest_path = DS_bfs(DS_robot.x, DS_robot.y, x, y);
+
+	if (shortest_path.length == 0) {
+		await DS_robot_idle(time);
+		return;
+	}
 
 	var T = (time / shortest_path.length) / 4;
 	for (let dir of shortest_path) {
@@ -355,9 +374,10 @@ async function DS_gen_board() {
 	let S = Math.floor((DS_GW - 10) / 2);
 	for (var x = S; x < S + parseInt(RAM_DEFAULT_CACHE_SIZE); x++) {
 		var y = DS_GH - 2;
-		DS_board_objects[x][y].type    = "memory";
-		DS_board_objects[x][y].version = RA(0, 2);
-		DS_board_objects[x][y+1].type  = "busy";
+		DS_board_objects[x][y-1].target = "memory-" + ((x - S + 1) % parseInt(RAM_DEFAULT_CACHE_SIZE));
+		DS_board_objects[x][y].type     = "memory";
+		DS_board_objects[x][y].version  = RA(0, 2);
+		DS_board_objects[x][y+1].type   = "busy";
 	}
 
 	/* generate horizontal frame */
@@ -473,17 +493,6 @@ async function DS_gen_board() {
 
 	DS_board = bitmap;
 }
-						
-function DS_dummy_event_play(e) {
-
-	DS_canvas.width  = DS_canvas.offsetWidth;
-	DS_canvas.height = DS_canvas.offsetHeight;
-
-	DS_ctx.font = "40px Arial";
-	DS_ctx.fillText(e, 10, 80);
-
-//	DS_gen_board();
-}
 
 function DS_get_input() {
 	return document.getElementById("DS-input").value;
@@ -579,4 +588,10 @@ function DS_update_dims(){
 	DS_canvas.width  = DS_W;
 	DS_canvas.height = DS_H;
 	DS_gen_board();
+}
+
+function DS_update_memory(mem) {
+	for (var i = 0; i < mem.length; i++)
+		for (var j = 0; j < 2; j++)
+			DS_memory[i][j] = mem[i][j];
 }

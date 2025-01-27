@@ -81,8 +81,8 @@
 	algin-items:     center;
 	justify-content: center;
 
-	overflow:        auto;
-	scrollbar-width: none;
+	overflow:        hidden;
+/*	scrollbar-width: none;*/
 }
 #DS-counters span {
 	display: inline;
@@ -97,3 +97,4 @@
 	font-family: 'PixelFont';
 	src: url('/assets/font.otf') format('opentype');
 }
+

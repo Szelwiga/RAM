@@ -295,13 +295,16 @@ class ram_machine {
 			this.ip = this.next_line[this.ip];
 			this.update_time_counter(res.events);
 			return {status: "ok", events: res.events, ins: line, line: curr_line};
-						
+
 		} else if (instruction == "add"  || instruction == "sub" || 
 		           instruction == "mult" || instruction == "div"){
 			/* the alu instructions */
 			var res = this.resolve_value(argument);
 			if (res.result == undefined){
 				return {status: "re", events: res.events, ins: line, line: curr_line};
+			}
+			if (this.memory[0] == undefined) {
+				return {status: "re", events: [{event: "runtime_error", ins: line, line: curr_line, details: "undefined value in accumulator"}], line: curr_line, ins: line, details: "undefined value in accumulator"};
 			}
 			if (instruction == "add"){
 				this.memory[0] = this.int64orBigInt(this.memory[0] + res.result);

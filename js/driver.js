@@ -44,6 +44,7 @@ var D_current_result         = undefined; /* result of currently performed instr
 var D_pressed_step           = false; /* if next animation should be executed */
 
 var D_animation_speeds_ps    = [5, 10, 25, 50, 100, 250, 500, 1000, 2000, 2500]; /* animation speeds for PS */
+var D_animation_speeds_ds    = [100, 250, 500, 1000, 1000, 1000, 1000, 1000, 1000, 1000]; /* animation speeds for DS */
 var D_animation_speed_index  = S_get_animation_speed_index(); /* index for above array */
 var D_animation_speed_levels = 10; /* above array length */
 
@@ -231,8 +232,12 @@ function BTN_code_run_full(){
 /* update function that plays events if D_state is running and animations should be performed */
 var D_refresh_rate = 5;
 var D_counter = 0;
-function D_update(){
-	var mod = D_animation_speeds_ps[D_animation_speed_index];
+function D_update() {
+	var mod;
+	if (SA_curr_sim == "PS")
+		mod = D_animation_speeds_ps[D_animation_speed_index];
+	else
+		mod = D_animation_speeds_ds[D_animation_speed_index];
 
 	D_counter += D_refresh_rate;
 	D_counter %= mod;
@@ -255,10 +260,10 @@ function D_update(){
 
 				D_events         = [...result.events];
 				D_current_result = result;
-	}
+			}
 		}
 		if (D_events.length != 0)
-			SA_process_step_result(D_events.shift(), D_current_result);
+			SA_process_step_result(D_events.shift(), D_current_result, mod);
 	}
 }
 setInterval(D_update, D_refresh_rate);

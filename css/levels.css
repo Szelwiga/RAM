@@ -122,6 +122,10 @@
 
 	flex-shrink: 0;
 }
+#L-level-buttons::-webkit-scrollbar {
+    display: none;
+    width:   0;
+}
 
 #L-problem-desc {
 	display:         flex;
