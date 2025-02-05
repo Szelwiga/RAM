@@ -102,7 +102,6 @@ class ram_machine {
 		this.cache_size  = BigInt(RAM_DEFAULT_CACHE_SIZE);
 		this.event_times = RAM_DEFAULT_EVENTS_TIMES;
 
-
 		this.clear_state();
 	}
 
@@ -169,7 +168,7 @@ class ram_machine {
 
 			events.push({event: "get_value", from: cell});
 			if (this.get_value(cell) == undefined){
-				events.push({event: "runtime_error", details: "read from undefined cell"})
+				events.push({event: "runtime_error", details: "read from undefined cell", line: this.curr_line})
 				return {result: undefined, events: events};
 			} else {
 				return {result: this.get_value(cell), events: events};
@@ -201,7 +200,7 @@ class ram_machine {
 		events.push({event: "get_value", from: cell});
 		var value = this.get_value(cell);
 		if (value == undefined) {
-			events.push({event: "runtime_error", details: "read undefined value"})
+			events.push({event: "runtime_error", details: "read undefined value", line: this.curr_line})
 			return {result: undefined, events: events};
 		} else {
 			return {result: value, events: events};
@@ -226,6 +225,7 @@ class ram_machine {
 		var argument    = this.code[this.ip][1];
 		var line        = instruction + " " + argument;
 		var curr_line   = this.ip;
+		this.curr_line  = curr_line;
 
 		this.instruction_counter++;
 		if (instruction == "read") {
@@ -353,7 +353,7 @@ class ram_machine {
 				this.ip = this.next_line[this.ip];
 			}
 			this.update_time_counter(events);
-			return {status: "ok", events: events, ins: "halt", line: curr_line};
+			return {status: "ok", events: events, ins: "jump", line: curr_line};
 			
 		} else if (instruction == "halt"){
 			var events = [{event: "halt"}];

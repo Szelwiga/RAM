@@ -44,7 +44,7 @@ var D_current_result         = undefined; /* result of currently performed instr
 var D_pressed_step           = false; /* if next animation should be executed */
 
 var D_animation_speeds_ps    = [5,  10,  25,  50,  100, 250, 500,  1000, 2000, 2500]; /* animation speeds for PS */
-var D_animation_speeds_ds    = [50, 100, 175, 250, 500, 750, 1000, 1500, 2000, 3000]; /* animation speeds for DS */
+var D_animation_speeds_ds    = [50, 125, 250, 500, 750, 1000, 2000, 3000, 4000, 5000]; /* animation speeds for DS */
 var D_animation_speed_index  = S_get_animation_speed_index(); /* index for above array */
 var D_animation_speed_levels = 10; /* above array length */
 
